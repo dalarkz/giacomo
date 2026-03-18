@@ -39,12 +39,14 @@
             <h2 class="pre-title decode-text">Bow Before The Creator</h2>
             
             <div class="image-wrapper parallax" data-speed="0.05">
-                <div class="image-container tilt-card">
-                    <img src="giacomo.png" alt="Giacomo, The Supreme Feline" class="portrait">
+                <div class="image-container tilt-card" id="secret-portrait" title="...">
+                    <img src="giacomo.png" alt="Giacomo, The Supreme Feline" class="portrait" id="portrait-trigger">
                     <div class="portrait-glow"></div>
                     <!-- Orbital rings around portrait -->
                     <div class="orbital-ring ring-1"></div>
                     <div class="orbital-ring ring-2"></div>
+                    <!-- Secret click counter -->
+                    <div id="secret-counter"></div>
                 </div>
             </div>
             
@@ -125,6 +127,41 @@
         </footer>
     </main>
 
+    <!-- ========= HIDDEN BONGO CAT GAME ========= -->
+    <div id="bongo-overlay">
+        <div id="bongo-modal">
+            <button id="bongo-close">✕</button>
+            <div id="bongo-header">
+                <span id="bongo-secret-label">🔒 SECRET DISCOVERED 🔒</span>
+                <h2 id="bongo-title">GIACOMO'S BONGO DOJO</h2>
+                <p id="bongo-subtitle">Click anywhere on the bongos to make GIACOMO SHRED</p>
+            </div>
+            <div id="bongo-game-area">
+                <canvas id="bongo-canvas" width="600" height="380"></canvas>
+                <div id="bongo-controls">
+                    <button id="bongo-left" class="bongo-pad left-pad">👈 LEFT BONGO</button>
+                    <button id="bongo-right" class="bongo-pad right-pad">RIGHT BONGO 👉</button>
+                </div>
+            </div>
+            <div id="bongo-stats">
+                <div class="bongo-stat">
+                    <div class="bongo-stat-value" id="bongo-total">0</div>
+                    <div class="bongo-stat-label">TOTAL BONGOS</div>
+                </div>
+                <div class="bongo-stat">
+                    <div class="bongo-stat-value" id="bongo-bpm">0</div>
+                    <div class="bongo-stat-label">BONGOS / SEC</div>
+                </div>
+                <div class="bongo-stat">
+                    <div class="bongo-stat-value" id="bongo-rank">E</div>
+                    <div class="bongo-stat-label">RANK</div>
+                </div>
+            </div>
+            <div id="bongo-milestone"></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="bongo.js"></script>
 </body>
 </html>
