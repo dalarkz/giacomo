@@ -13,34 +13,215 @@ document.addEventListener("DOMContentLoaded", () => {
     function initAudio() {
         if (!audioCtx) audioCtx = new AudioContext();
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
-        // --- COSMIC DRONE (Continuous background hum) ---
-        droneOsc = audioCtx.createOscillator();
-        droneOsc.type = 'sawtooth';
-        droneOsc.frequency.setValueAtTime(45, audioCtx.currentTime); 
-        
-        const lfo = audioCtx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.2; // very slow modulation
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 10;
-        lfo.connect(lfoGain);
-        lfoGain.connect(droneOsc.frequency);
-        
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 150;
-        
-        const droneVolume = audioCtx.createGain();
-        droneVolume.gain.value = 0.08; 
-        
-        droneOsc.connect(filter);
-        filter.connect(droneVolume);
-        droneVolume.connect(audioCtx.destination);
-        
-        droneOsc.start();
-        lfo.start();
+        startFurElise();
     }
+
+    /* ------------------------------------------------
+       PIANO SYNTHESIZER — Für Elise (Beethoven)
+       Realistic grand piano tone via ADSR + harmonics
+    ------------------------------------------------ */
+
+    // Note frequencies (Hz)
+    const NOTE = {
+        C3:130.81, D3:146.83, Eb3:155.56, E3:164.81, F3:174.61,
+        G3:196.00, Ab3:207.65, A3:220.00, Bb3:233.08, B3:246.94,
+        C4:261.63, D4:293.66, Eb4:311.13, E4:329.63, F4:349.23,
+        G4:392.00, Ab4:415.30, A4:440.00, Bb4:466.16, B4:493.88,
+        C5:523.25, D5:587.33, Eb5:622.25, E5:659.25, F5:698.46,
+        G5:783.99, A5:880.00
+    };
+
+    // Für Elise — melody (right hand) + bass (left hand)
+    // Each entry: [freq_right, freq_left, duration_beats]
+    const BPM = 72;
+    const BEAT = 60 / BPM; // seconds per beat
+
+    // Using null for rests / no bass
+    const FUR_ELISE = [
+        // Theme A — opening motif
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.C5,  null,      0.5],
+        [NOTE.A4,  NOTE.A3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.C4,  NOTE.E3,   0.5],
+        [NOTE.E4,  NOTE.A3,   0.5],
+        [NOTE.A4,  null,      0.5],
+        [NOTE.B4,  NOTE.E3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.E4,  NOTE.Ab3,  0.5],
+        [NOTE.Ab4, NOTE.C4,   0.5],
+        [NOTE.A4,  null,      0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.C5,  NOTE.A3,   1.0],
+
+        // repeat motif
+        [null,     null,      0.5],
+        [NOTE.E4,  NOTE.C4,   0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.C5,  NOTE.A3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.C5,  null,      0.5],
+        [NOTE.A4,  NOTE.A3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.C4,  NOTE.E3,   0.5],
+        [NOTE.E4,  NOTE.A3,   0.5],
+        [NOTE.A4,  null,      0.5],
+        [NOTE.B4,  NOTE.E3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.E4,  NOTE.Ab3,  0.5],
+        [NOTE.C5,  NOTE.C4,   0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.A4,  NOTE.A3,   2.0],
+
+        // Theme B (middle section)
+        [NOTE.B4,  NOTE.E3,   0.5],
+        [NOTE.C5,  NOTE.A3,   0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.E5,  NOTE.A3,   1.0],
+        [NOTE.G4,  NOTE.C4,   0.5],
+        [NOTE.F5,  null,      0.5],
+        [NOTE.E5,  NOTE.A3,   1.0],
+        [NOTE.E4,  NOTE.A3,   0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.D5,  NOTE.E3,   1.0],
+        [NOTE.F4,  NOTE.B3,   0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.C5,  NOTE.A3,   1.0],
+        [NOTE.E4,  NOTE.A3,   0.5],
+        [NOTE.C5,  null,      0.5],
+        [NOTE.B4,  NOTE.E3,   1.0],
+
+        // Return to theme A
+        [null,     null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.Eb5, null,      0.5],
+        [NOTE.E5,  null,      0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.D5,  null,      0.5],
+        [NOTE.C5,  null,      0.5],
+        [NOTE.A4,  NOTE.A3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.C4,  NOTE.E3,   0.5],
+        [NOTE.E4,  NOTE.A3,   0.5],
+        [NOTE.A4,  null,      0.5],
+        [NOTE.B4,  NOTE.E3,   1.0],
+        [null,     null,      0.5],
+        [NOTE.E4,  NOTE.Ab3,  0.5],
+        [NOTE.C5,  NOTE.C4,   0.5],
+        [NOTE.B4,  null,      0.5],
+        [NOTE.A4,  NOTE.A3,   2.5],
+    ];
+
+    let furEliseTimeout = null;
+    let masterGain = null;
+
+    function playPianoNote(freq, time, duration, volume = 0.18) {
+        if (!audioCtx || !freq) return;
+
+        const gain = audioCtx.createGain();
+        gain.connect(masterGain);
+
+        // Piano ADSR envelope
+        const attack  = 0.006;
+        const decay   = duration * 0.3;
+        const sustain = volume * 0.35;
+        const release = Math.min(duration * 0.6, 1.2);
+
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(volume, time + attack);
+        gain.gain.exponentialRampToValueAtTime(sustain, time + attack + decay);
+        gain.gain.setValueAtTime(sustain, time + duration - release);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + duration + release);
+
+        // Layer 3 oscillators for piano timbre (fundamental + 2nd + 4th harmonic)
+        const harmonics = [
+            { type: 'triangle', detune: 0,    gainMul: 1.0 },
+            { type: 'sine',     detune: 1200, gainMul: 0.25 },  // 2nd harmonic
+            { type: 'sine',     detune: 1902, gainMul: 0.10 },  // 3rd harmonic
+        ];
+
+        harmonics.forEach(h => {
+            const osc = audioCtx.createOscillator();
+            const hGain = audioCtx.createGain();
+            osc.type = h.type;
+            osc.frequency.value = freq;
+            osc.detune.value = h.detune;
+            hGain.gain.value = h.gainMul;
+            osc.connect(hGain);
+            hGain.connect(gain);
+            osc.start(time);
+            osc.stop(time + duration + release + 0.1);
+        });
+    }
+
+    function startFurElise() {
+        if (!audioCtx) return;
+
+        // Master output chain with soft reverb (convolver simulation via delay)
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.55;
+
+        // Warm low-pass filter to smooth the tone
+        const warmFilter = audioCtx.createBiquadFilter();
+        warmFilter.type = 'lowpass';
+        warmFilter.frequency.value = 4800;
+        warmFilter.Q.value = 0.5;
+
+        // Soft reverb via feedback delay
+        const delay = audioCtx.createDelay(0.5);
+        delay.delayTime.value = 0.28;
+        const delayGain = audioCtx.createGain();
+        delayGain.gain.value = 0.22;
+        delay.connect(delayGain);
+        delayGain.connect(delay);          // feedback loop
+        delayGain.connect(warmFilter);
+
+        masterGain.connect(warmFilter);
+        masterGain.connect(delay);
+        warmFilter.connect(audioCtx.destination);
+
+        scheduleFurElise();
+    }
+
+    function scheduleFurElise() {
+        if (!audioCtx || !masterGain) return;
+
+        let time = audioCtx.currentTime + 0.3; // small start delay
+
+        FUR_ELISE.forEach(([right, left, beats]) => {
+            const dur = beats * BEAT;
+            if (right) playPianoNote(right, time, dur, 0.18);
+            if (left)  playPianoNote(left,  time, dur * 1.2, 0.10); // bass slightly longer
+            time += dur;
+        });
+
+        // Total piece duration
+        const totalDuration = FUR_ELISE.reduce((sum, [,, b]) => sum + b * BEAT, 0);
+
+        // Loop seamlessly
+        furEliseTimeout = setTimeout(() => {
+            scheduleFurElise();
+        }, (totalDuration - 0.1) * 1000);
+    }
+
 
     function playLaser() {
         if(!audioCtx) return;
