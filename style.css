@@ -823,3 +823,334 @@ footer p {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ================================================
+   LIVE CULT STATS BAR
+================================================ */
+#cult-stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255, 170, 0, 0.06);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    margin-bottom: 3rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+.cult-stat {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.cult-stat span:not(.cult-icon) {
+    color: var(--primary);
+    font-weight: bold;
+}
+.cult-icon { font-size: 1.1rem; }
+.cult-divider {
+    color: rgba(255,170,0,0.25);
+    font-size: 1.4rem;
+}
+
+/* ================================================
+   ORACLE SECTION
+================================================ */
+.oracle-section {
+    padding: 6rem 0;
+    text-align: center;
+}
+.oracle-intro {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.oracle-box {
+    max-width: 750px;
+    margin: 0 auto;
+    background: rgba(20, 10, 40, 0.7);
+    border: 1px solid rgba(180, 80, 255, 0.3);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 0 60px rgba(180, 80, 255, 0.15), inset 0 0 30px rgba(180, 80, 255, 0.05);
+}
+.oracle-eye-container {
+    position: relative;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.oracle-eye-glow {
+    position: absolute;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(180, 80, 255, 0.5) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulseGlow 2s infinite alternate;
+}
+.oracle-eye-icon {
+    font-size: 5rem;
+    position: relative;
+    z-index: 2;
+    animation: rotateSlow 10s linear infinite;
+    filter: drop-shadow(0 0 15px rgba(180, 80, 255, 0.9));
+    display: block;
+    line-height: 1;
+}
+@keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.oracle-input-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+#oracle-input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(180, 80, 255, 0.4);
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+#oracle-input:focus {
+    border-color: rgba(180, 80, 255, 0.8);
+    box-shadow: 0 0 20px rgba(180, 80, 255, 0.3);
+}
+#oracle-ask-btn {
+    padding: 1rem 2rem;
+    background: rgba(180, 80, 255, 0.15);
+    border: 2px solid rgba(180, 80, 255, 0.6);
+    color: #c470ff;
+    font-family: var(--font-mono);
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: 0.3s;
+    letter-spacing: 2px;
+}
+#oracle-ask-btn:hover {
+    background: rgba(180, 80, 255, 0.4);
+    box-shadow: 0 0 25px rgba(180, 80, 255, 0.5);
+    color: #fff;
+}
+.oracle-response {
+    min-height: 3rem;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: #c470ff;
+    text-shadow: 0 0 15px rgba(180, 80, 255, 0.8);
+    opacity: 0;
+    transition: opacity 0.4s;
+    padding: 1rem;
+    border-top: 1px solid rgba(180, 80, 255, 0.2);
+    line-height: 1.6;
+}
+.oracle-response.visible { opacity: 1; }
+
+/* ================================================
+   TESTIMONIALS SECTION
+================================================ */
+.testimonials-section {
+    padding: 6rem 0;
+}
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 2rem;
+}
+.testimonial-card {
+    background: rgba(15, 15, 25, 0.7);
+    border: 1px solid rgba(255,220,50,0.15);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: left;
+    transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(10px);
+}
+.testimonial-card:hover {
+    border-color: rgba(255,220,50,0.5);
+    box-shadow: 0 15px 40px rgba(255,220,50,0.1);
+}
+.testimonial-stars {
+    color: #ffd700;
+    font-size: 1.4rem;
+    letter-spacing: 4px;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 0 10px rgba(255,215,0,0.7);
+}
+.testimonial-quote {
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #d0d0e0;
+    line-height: 1.7;
+    margin-bottom: 1.8rem;
+    position: relative;
+}
+.testimonial-quote::before {
+    content: '"';
+    font-size: 5rem;
+    color: rgba(255,215,0,0.1);
+    position: absolute;
+    top: -20px; left: -15px;
+    font-family: var(--font-heading);
+    line-height: 1;
+}
+.testimonial-author {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    border-top: 1px solid rgba(255,215,0,0.1);
+    padding-top: 1rem;
+}
+.testimonial-name {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: #ffd700;
+    letter-spacing: 1px;
+}
+.testimonial-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+/* ================================================
+   CERTIFICATE SECTION
+================================================ */
+.certificate-section {
+    padding: 6rem 0;
+    text-align: center;
+}
+.cert-generator {
+    max-width: 870px;
+    margin: 0 auto;
+    background: rgba(10, 8, 20, 0.8);
+    border: 1px solid rgba(255, 170, 0, 0.25);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 0 60px rgba(255,170,0,0.1);
+}
+.cert-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+.cert-form input, .cert-form select {
+    padding: 1rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    flex: 1;
+    min-width: 200px;
+}
+.cert-form select option { background: #111; color: #fff; }
+.cert-form input:focus, .cert-form select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(255,170,0,0.3);
+}
+#cert-generate-btn {
+    padding: 1rem 2.5rem;
+    background: rgba(255,170,0,0.1);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    transition: 0.3s;
+}
+#cert-generate-btn:hover {
+    background: var(--primary);
+    color: #000;
+    box-shadow: 0 0 25px var(--primary);
+}
+#cert-canvas {
+    display: none;
+    border: 2px solid rgba(255,170,0,0.3);
+    border-radius: 12px;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+}
+#cert-download-btn {
+    padding: 0.9rem 3rem;
+    background: rgba(0,200,100,0.1);
+    border: 2px solid #00c864;
+    color: #00c864;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    transition: 0.3s;
+}
+#cert-download-btn:hover {
+    background: #00c864;
+    color: #000;
+    box-shadow: 0 0 25px #00c864;
+}
+
+/* ================================================
+   KONAMI CODE EXPLOSION
+================================================ */
+#konami-explosion {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.95);
+    font-family: var(--font-heading);
+    text-align: center;
+}
+#konami-explosion.show { display: flex; }
+#konami-title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    color: var(--primary);
+    text-shadow: 0 0 60px var(--primary), 0 0 120px var(--primary);
+    animation: massiveGlitch 1s infinite;
+    letter-spacing: 5px;
+}
+#konami-sub {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-top: 1.5rem;
+    letter-spacing: 4px;
+}
+#konami-close-btn {
+    margin-top: 3rem;
+    padding: 1rem 3rem;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    border-radius: 8px;
+    letter-spacing: 3px;
+    transition: 0.3s;
+}
+#konami-close-btn:hover { background: #fff; color: #000; }
