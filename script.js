@@ -296,9 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
         enterOverlay.style.opacity = '0';
         setTimeout(() => {
             enterOverlay.style.visibility = 'hidden';
-            playBassDrop();
-            document.body.classList.add('shake-active');
-            setTimeout(() => document.body.classList.remove('shake-active'), 500);
         }, 1000);
     });
 

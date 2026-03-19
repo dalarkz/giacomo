@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIACOMO :: GRIMOIRE PRIMORDIAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gold:      #c8941e;
+            --gold-dim:  #8b6310;
+            --gold-light:#f0c060;
+            --parch:     #1a1208;
+            --parch2:    #110d05;
+            --ink:       #e8d8b0;
+            --ink-dim:   #a08060;
+            --red:       #8b1a1a;
+            --shadow:    rgba(0,0,0,.7);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: #080602;
+            color: var(--ink);
+            font-family: 'IM Fell English', Georgia, serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── PARTICLES BG ── */
+        #dust-canvas {
+            position: fixed; inset: 0; z-index: 0;
+            pointer-events: none; opacity: .3;
+        }
+
+        /* ── BACK BUTTON ── */
+        .back-btn {
+            position: fixed; top: 1rem; left: 1rem; z-index: 100;
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: .75rem;
+            padding: .4rem 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all .2s;
+        }
+        .back-btn:hover { background: var(--gold); color: #000; }
+
+        /* ── COVER PAGE ── */
+        .cover {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: radial-gradient(ellipse at center, #1e1408 0%, #080602 70%);
+            border-bottom: 2px solid var(--gold-dim);
+        }
+
+        .cover-ornament {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            animation: floatGlow 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(200,148,30,.6));
+        }
+        @keyframes floatGlow {
+            0%,100% { transform: translateY(0); filter: drop-shadow(0 0 20px rgba(200,148,30,.4)); }
+            50%      { transform: translateY(-10px); filter: drop-shadow(0 0 40px rgba(200,148,30,.9)); }
+        }
+
+        .cover-sub {
+            font-family: 'Cinzel', serif;
+            font-size: .75rem;
+            letter-spacing: 6px;
+            color: var(--gold-dim);
+            margin-bottom: 1rem;
+        }
+        .cover-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            color: var(--gold-light);
+            text-shadow: 0 0 40px rgba(200,148,30,.5), 0 4px 8px rgba(0,0,0,.8);
+            line-height: 1.2;
+            margin-bottom: .5rem;
+        }
+        .cover-subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 2.5vw, 1.6rem);
+            color: var(--gold);
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+        }
+
+        .cover-divider {
+            width: 300px; height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold), transparent);
+            margin: 1.5rem auto;
+            position: relative;
+        }
+        .cover-divider::before {
+            content: '✦';
+            position: absolute; top: -8px; left: 50%;
+            transform: translateX(-50%);
+            color: var(--gold); font-size: .9rem;
+            background: #1a1208; padding: 0 .5rem;
+        }
+
+        .cover-quote {
+            font-style: italic;
+            font-size: 1.05rem;
+            color: var(--ink-dim);
+            max-width: 500px;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .cover-scroll-hint {
+            font-family: 'Cinzel', serif;
+            font-size: .7rem;
+            letter-spacing: 3px;
+            color: var(--gold-dim);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+        /* ── TABLE OF CONTENTS ── */
+        .toc {
+            position: relative; z-index: 1;
+            max-width: 800px; margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .toc-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+        }
+        .toc-list { list-style: none; }
+        .toc-item {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1rem;
+            padding: .6rem 0;
+            border-bottom: 1px solid rgba(200,148,30,.1);
+        }
+        .toc-num {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-dim);
+            font-size: .8rem;
+            min-width: 30px;
+        }
+        .toc-link {
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color .2s;
+        }
+        .toc-link:hover { color: var(--gold-light); }
+        .toc-dots {
+            flex: 1; border-bottom: 1px dotted rgba(200,148,30,.3);
+            max-width: 120px;
+        }
+
+        /* ── CHAPTER ── */
+        .chapter {
+            position: relative; z-index: 1;
+            max-width: 780px; margin: 0 auto;
+            padding: 4rem 2.5rem;
+            border-top: 1px solid rgba(200,148,30,.15);
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .chapter-num {
+            font-family: 'Cinzel', serif;
+            font-size: .7rem;
+            letter-spacing: 5px;
+            color: var(--gold-dim);
+            margin-bottom: .5rem;
+        }
+        .chapter-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--gold-light);
+            text-shadow: 0 0 20px rgba(200,148,30,.3);
+            margin-bottom: 1rem;
+        }
+        .chapter-ornament {
+            font-size: 2rem;
+            color: var(--gold);
+            opacity: .6;
+        }
+
+        .chapter-body {
+            line-height: 2;
+            font-size: 1.05rem;
+        }
+        .chapter-body p { margin-bottom: 1.5rem; text-align: justify; }
+        .chapter-body p:first-child::first-letter {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3.8rem;
+            color: var(--gold-light);
+            float: left;
+            line-height: .75;
+            padding: .1em .12em 0 0;
+            text-shadow: 0 0 20px rgba(200,148,30,.5);
+        }
+        .chapter-body em  { color: var(--gold-light); font-style: italic; }
+        .chapter-body strong { color: var(--gold); font-weight: bold; }
+        .chapter-body blockquote {
+            border-left: 3px solid var(--gold-dim);
+            margin: 2rem 0;
+            padding: 1rem 1.5rem;
+            background: rgba(200,148,30,.04);
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--gold-light);
+        }
+        .inline-icon { font-size: 1.2rem; }
+
+        /* ── INTER-CHAPTER ORNAMENT ── */
+        .sep {
+            text-align: center;
+            color: var(--gold);
+            font-size: 1.2rem;
+            letter-spacing: 8px;
+            padding: 2rem 0;
+            opacity: .5;
+        }
+
+        /* ── EPILOGUE / FINAL ── */
+        .epilogue {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 5rem 2rem;
+            background: radial-gradient(ellipse at center, #1e1408 0%, #080602 80%);
+            border-top: 2px solid var(--gold-dim);
+        }
+        .epilogue-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            margin-bottom: 1.5rem;
+        }
+        .epilogue-text {
+            font-size: 1rem;
+            color: var(--ink-dim);
+            max-width: 550px;
+            margin: 0 auto 2rem;
+            line-height: 2;
+            font-style: italic;
+        }
+        .seal {
+            font-size: 4rem;
+            animation: floatGlow 5s ease-in-out infinite;
+        }
+        .epilogue-serial {
+            font-family: 'Cinzel', serif;
+            font-size: .65rem;
+            color: var(--gold-dim);
+            letter-spacing: 3px;
+            margin-top: 2rem;
+            opacity: .5;
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #080602; }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+        /* ── FADE IN ANIMATION ── */
+        .fade-in {
+            opacity: 0; transform: translateY(20px);
+            transition: opacity .8s ease, transform .8s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media(max-width:600px) {
+            .chapter { padding: 3rem 1.2rem; }
+            .chapter-body p:first-child::first-letter { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="dust-canvas"></canvas>
+<a class="back-btn" href="index.html">⬅ RETOUR</a>
+
+<!-- ══════════════════════════════
+     COVER
+══════════════════════════════ -->
+<section class="cover">
+    <div class="cover-ornament">𖤐</div>
+    <div class="cover-sub">GRIMOIRE PRIMORDIAL — VOL. I</div>
+    <h1 class="cover-title">GIACOMO</h1>
+    <div class="cover-subtitle">Le Primordial aux Neuf Vies Infinies</div>
+    <div class="cover-divider"></div>
+    <p class="cover-quote">
+        <em>"Tout ce qui tombe doit être poussé du bord de la table de l'univers."</em><br>
+        — Giacomo, Avant la Naissance du Temps
+    </p>
+    <div class="cover-divider"></div>
+    <div class="cover-scroll-hint">↓ FAITES DÉFILER POUR LIRE ↓</div>
+</section>
+
+<!-- ══════════════════════════════
+     TABLE DES MATIÈRES
+══════════════════════════════ -->
+<nav class="toc fade-in">
+    <div class="toc-title">✦ Table des Matières ✦</div>
+    <ul class="toc-list">
+        <li class="toc-item">
+            <span class="toc-num">I</span>
+            <a class="toc-link" href="#ch1">Le Mythe de la Création</a>
+            <span class="toc-dots"></span>
+        </li>
+        <li class="toc-item">
+            <span class="toc-num">II</span>
+            <a class="toc-link" href="#ch2">Le Souverain des Multivers</a>
+            <span class="toc-dots"></span>
+        </li>
+        <li class="toc-item">
+            <span class="toc-num">III</span>
+            <a class="toc-link" href="#ch3">Sa Présence Numérique</a>
+            <span class="toc-dots"></span>
+        </li>
+        <li class="toc-item">
+            <span class="toc-num">IV</span>
+            <a class="toc-link" href="#ch4">Le Dogme de Giacomo</a>
+            <span class="toc-dots"></span>
+        </li>
+        <li class="toc-item">
+            <span class="toc-num">V</span>
+            <a class="toc-link" href="#ch5">Le Regard Omniscient</a>
+            <span class="toc-dots"></span>
+        </li>
+    </ul>
+</nav>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     CHAPITRE I
+══════════════════════════════ -->
+<article class="chapter fade-in" id="ch1">
+    <div class="chapter-header">
+        <div class="chapter-num">CHAPITRE PREMIER</div>
+        <h2 class="chapter-title">Le Mythe de la Création</h2>
+        <div class="chapter-ornament">🌌</div>
+    </div>
+    <div class="chapter-body">
+        <p>
+            Bien avant que le premier serveur ne soit branché ou que la première galaxie ne s'enroule sur elle-même,
+            il y avait le <strong>Ronronnement Originel</strong>. C'est de cette vibration pure qu'est né Giacomo.
+            On ne le voit pas comme un simple chat, mais comme <em>l'entité qui a tissé les fils du temps et de l'espace
+            avec ses propres griffes</em>.
+        </p>
+        <p>
+            Cette vibration — perceptible uniquement par ceux dont l'esprit s'est libéré des illusions du monde matériel —
+            résonnait à travers un vide qui n'était ni lumière ni obscurité, mais quelque chose d'antérieur aux deux.
+            Les physiciens modernes appellent cela le <em>point de singularité</em>. Les théologiens l'appellent
+            <em>l'acte divin</em>. Giacomo, lui, l'appelle simplement : <strong>son réveil du matin</strong>.
+        </p>
+        <p>
+            Né d'un ronronnement cosmique, Giacomo n'a pas simplement <em>existé</em> — il a <em>choisi</em> d'exister.
+            Et c'est cette distinction fondamentale qui le sépare de toute autre entité de la création. Là où les dieux
+            furent invoqués par la croyance des hommes, Giacomo s'est invoqué lui-même, par pure indifférence pour
+            le néant qui l'entourait.
+        </p>
+        <blockquote>
+            "Je n'ai pas créé l'univers. Je l'ai simplement toléré."<br>
+            <small>— Giacomo, à un journaliste quantique interdimensionnel</small>
+        </blockquote>
+    </div>
+</article>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     CHAPITRE II
+══════════════════════════════ -->
+<article class="chapter fade-in" id="ch2">
+    <div class="chapter-header">
+        <div class="chapter-num">CHAPITRE SECOND</div>
+        <h2 class="chapter-title">Le Souverain des Multivers</h2>
+        <div class="chapter-ornament">🐾</div>
+    </div>
+    <div class="chapter-body">
+        <p>
+            Dans chaque réalité, Giacomo possède un <strong>trône différent</strong>. Les dimensions parallèles ne sont
+            pas, pour lui, des curiosités scientifiques — ce sont ses <em>différentes chambres</em>, chacune aménagée
+            selon son humeur du moment.
+        </p>
+        <p>
+            Dans certaines dimensions, il est <em>une nébuleuse stellaire en forme de félin</em>, chassant des comètes
+            à travers l'obscurité interstellaire avec la même désinvolture qu'il chasserait une pelote de laine.
+            Les astronomes qui observent ces formations à travers leurs téléscopes parlent de "turbulences gravitationnelles
+            inexpliquées". Giacomo, lui, parle de <em>jeu</em>.
+        </p>
+        <p>
+            Dans d'autres dimensions, il est <strong>le code source même de la réalité</strong>, surveillant les bugs
+            de l'univers depuis son perchoir invisible. Quand un électron se comporte de manière imprévisible,
+            quand la lumière hésite entre onde et particule — c'est lui qui appuie sur les touches.
+            Il ne corrige pas les bugs ; il décide lesquels sont des fonctionnalités.
+        </p>
+        <p>
+            Tous les félins, du plus petit chat de gouttière au <em>tigre de feu des dimensions astrales</em>,
+            répondent à son appel. Ils sont ses yeux et ses oreilles dans chaque recoin du cosmos. Quand votre chat
+            fixe un mur vide à 3h du matin, il ne voit pas rien — il <strong>reçoit un rapport</strong>.
+        </p>
+        <blockquote>
+            "Les autres dieux ont des armées. J'ai des chats. C'est moins bruyant et infiniment plus efficace."<br>
+            <small>— Giacomo, lors du Grand Concile des Entités Primordiales</small>
+        </blockquote>
+    </div>
+</article>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     CHAPITRE III
+══════════════════════════════ -->
+<article class="chapter fade-in" id="ch3">
+    <div class="chapter-header">
+        <div class="chapter-num">CHAPITRE TROISIÈME</div>
+        <h2 class="chapter-title">Sa Présence Numérique</h2>
+        <div class="chapter-ornament">💻</div>
+    </div>
+    <div class="chapter-body">
+        <p>
+            Le site internet de Giacomo n'est pas un simple portfolio : <em>c'est un autel technologique</em>.
+            Giacomo a choisi cet espace pour s'adresser aux mortels capables de comprendre le langage binaire.
+            Il ne cherche pas l'adoration classique — les sacrifices d'encens et les prières psalmodiées
+            l'ennuient profondément — mais <strong>la maîtrise de l'information</strong>.
+        </p>
+        <p>
+            Chaque pixel de ce site a été délibérément choisi. Chaque animation, chaque ligne de code est
+            une <em>invocation</em>. Le fond noir n'est pas une préférence esthétique — c'est le vide primordial
+            d'où Giacomo est né, rendu visible en hexadécimal. L'or et le feu qui illuminent les titres
+            sont les couleurs de la première flamme que ses griffes ont allumée en étripant le tissu
+            du néant originel.
+        </p>
+        <p>
+            Ceux qui parviennent à percer les secrets cachés de ce sanctuaire numérique — les codes,
+            les séquences secrètes, les vérités dissimulées dans les angles morts de l'interface —
+            sont considérés comme les <strong>Élus de Giacomo</strong>. Non pas qu'il les récompense.
+            Mais il les <em>tolère davantage</em>, ce qui, dans l'échelle valorielle du Primordial Taboré,
+            est la plus haute distinction imaginable.
+        </p>
+        <blockquote>
+            "Si tu lis ces lignes, c'est que tu as su voir ce que les profanes ignorent. Je ne suis pas impressionné.
+            Mais je prends note."<br>
+            <small>— Giacomo, message codé dans les métadonnées du site</small>
+        </blockquote>
+    </div>
+</article>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     CHAPITRE IV
+══════════════════════════════ -->
+<article class="chapter fade-in" id="ch4">
+    <div class="chapter-header">
+        <div class="chapter-num">CHAPITRE QUATRIÈME</div>
+        <h2 class="chapter-title">Le Dogme de Giacomo</h2>
+        <div class="chapter-ornament">⚡</div>
+    </div>
+    <div class="chapter-body">
+        <p>
+            <strong>"Tout ce qui tombe doit être poussé du bord de la table de l'univers."</strong>
+            C'est sa philosophie fondamentale, gravée non pas dans la pierre ou sur parchemin,
+            mais dans les lois mêmes de la physique quantique, que Giacomo a rédigées un mardi
+            après-midi entre deux siestes cosmiques.
+        </p>
+        <p>
+            Le <em>chaos constructif</em> : telle est sa voie. Giacomo ne détruit pas par malice
+            ou par cruauté. Il détruit parce qu'il a compris une vérité que les bâtisseurs
+            d'empires n'ont jamais saisie — <strong>rien de grand n'est jamais construit
+            sur des fondations intactes</strong>. Il faut d'abord pousser l'ancien du bord,
+            regarder tomber, puis reconstruire, pixel par pixel, monde par monde.
+        </p>
+        <p>
+            Les stoïciens cherchaient le détachement. Les bouddhistes cherchaient le vide.
+            Giacomo, lui, <em>est</em> le vide. Il n'a pas besoin de le chercher — il en vient.
+            Et la sagesse qu'on tire de cette philosophie est d'une brutalité rafraîchissante :
+            <strong>si quelque chose peut tomber, c'est qu'il méritait de tomber</strong>.
+            Le reste, lui, ronronne tranquillement sur la table, éternel et imperturbable.
+        </p>
+        <blockquote>
+            "On me demande parfois si j'ai des regrets. J'ai réfléchi longuement à cette question.
+            Non. Je n'en ai aucun. La prochaine question ?"<br>
+            <small>— Giacomo, interview avec le Conseil des Entités Éternelles, an −∞</small>
+        </blockquote>
+    </div>
+</article>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     CHAPITRE V
+══════════════════════════════ -->
+<article class="chapter fade-in" id="ch5">
+    <div class="chapter-header">
+        <div class="chapter-num">CHAPITRE CINQUIÈME</div>
+        <h2 class="chapter-title">Le Regard Omniscient</h2>
+        <div class="chapter-ornament">👁️</div>
+    </div>
+    <div class="chapter-body">
+        <p>
+            Il y a un endroit entre la lumière et les ténèbres, entre le code qui s'exécute et celui
+            qui attend — un <em>seuil invisible</em> que Giacomo habite en permanence.
+            Son regard ne se déplace pas de cible en cible comme celui des mortels.
+            Il <strong>embrasse tout simultanément</strong>, depuis les cycles d'un électron
+            jusqu'à l'expansion des superamas galactiques.
+        </p>
+        <p>
+            Si l'on survole certaines zones de son sanctuaire numérique avec suffisamment d'attention,
+            on perçoit quelque chose. Deux yeux. Brillants. Félins. Dont la pupille verticale
+            s'ajuste à la lumière d'écrans que Giacomo observe depuis l'autre côté de la réalité.
+            Ce n'est pas une métaphore. <em>C'est un avertissement</em>.
+        </p>
+        <p>
+            Les anciens textes de plusieurs civilisations disparues mentionnent un symbole récurrent :
+            deux iris dorés sur fond de vide absolu. Les archéologues ont longtemps cru qu'il s'agissait
+            d'une divinité solaire. Ils avaient à moitié raison. <strong>C'était Giacomo</strong>,
+            photographié par des peuples qui n'avaient pas encore inventé l'appareil photo
+            mais qui savaient, instinctivement, qu'ils devaient <em>documenter ce qu'ils voyaient</em>
+            avant de l'oublier.
+        </p>
+        <p>
+            Car voilà le paradoxe du Regard Omniscient : Giacomo vous voit. Toujours.
+            Mais si vous êtes en train de lire ces mots, c'est que vous l'avez, d'une certaine façon,
+            <strong>vu en retour</strong>. Et cela, dans les neuf dimensions de son existence,
+            est extrêmement rare. Savourez ce moment. Il ne se répètera probablement pas
+            avant plusieurs millénaires.
+        </p>
+        <blockquote>
+            "Vous pensez m'observer. C'est mignon."<br>
+            <small>— Giacomo, en réponse à tous ceux qui l'ont jamais regardé</small>
+        </blockquote>
+    </div>
+</article>
+
+<div class="sep">✦ ✦ ✦</div>
+
+<!-- ══════════════════════════════
+     ÉPILOGUE
+══════════════════════════════ -->
+<footer class="epilogue fade-in">
+    <div class="seal">𖤐</div>
+    <h2 class="epilogue-title">Fin du Premier Volume</h2>
+    <p class="epilogue-text">
+        Ce grimoire a été transcrit par les soins des Scribes du Sanctuaire Numérique,
+        sous l'autorité tacite et légèrement condescendante de <em>Giacomo lui-même</em>,
+        qui a relu le manuscrit, hoché la tête une fois, et s'est rendormi.
+        <br><br>
+        Ce geste a été interprété comme un signe d'approbation.
+    </p>
+    <div class="cover-divider"></div>
+    <p style="font-family:'Cinzel',serif;font-size:.8rem;color:var(--gold-dim);margin-top:1.5rem;">
+        ✦ L'HISTOIRE CONTINUE. LE MAÎTRE OBSERVE. ✦
+    </p>
+    <div class="epilogue-serial">
+        GIACOMO ENTERPRISES · GRIMOIRE VOL.I · EST. AVANT LE TEMPS · DOC-REF: ∞-GIE-PRIMORDIAL
+    </div>
+</footer>
+
+<script>
+/* ── DUST PARTICLES ── */
+(function(){
+    const cv = document.getElementById('dust-canvas');
+    const cx = cv.getContext('2d');
+    let particles = [];
+    function resize(){
+        cv.width  = window.innerWidth;
+        cv.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    for(let i=0;i<120;i++) particles.push({
+        x: Math.random()*window.innerWidth,
+        y: Math.random()*window.innerHeight,
+        size: Math.random()*1.5+0.2,
+        vx: (Math.random()-.5)*0.2,
+        vy: (Math.random()-.45)*0.3,
+        alpha: Math.random()*0.5+0.1,
+        color: Math.random()>.5?'200,148,30':'240,192,96'
+    });
+
+    function draw(){
+        cx.clearRect(0,0,cv.width,cv.height);
+        particles.forEach(p=>{
+            p.x+=p.vx; p.y+=p.vy;
+            if(p.y<-5) p.y=cv.height+5;
+            if(p.x<0) p.x=cv.width; if(p.x>cv.width) p.x=0;
+            cx.beginPath();
+            cx.arc(p.x,p.y,p.size,0,Math.PI*2);
+            cx.fillStyle=`rgba(${p.color},${p.alpha})`;
+            cx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+/* ── FADE IN SCROLL ── */
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -631,11 +631,19 @@
     const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
     let konamiIdx = 0;
 
+    /* ====================================================
+       6. NETWORK VOID SECRET CODE
+       ↑ ↓ ← → → ← ↓ ↑  → ouvre network.html
+    ==================================================== */
+    const NET_CODE = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ArrowRight','ArrowLeft','ArrowDown','ArrowUp'];
+    let netCodeIdx = 0;
+
     const konamiEl    = document.getElementById('konami-explosion');
     const konamiClose = document.getElementById('konami-close-btn');
     const konamiCv    = document.getElementById('konami-canvas');
 
     document.addEventListener('keydown', (e) => {
+        // — Konami check —
         if (e.key === KONAMI[konamiIdx]) {
             konamiIdx++;
             if (konamiIdx === KONAMI.length) {
@@ -645,7 +653,38 @@
         } else {
             konamiIdx = 0;
         }
+
+        // — Network Void code check —
+        if (e.key === NET_CODE[netCodeIdx]) {
+            netCodeIdx++;
+            if (netCodeIdx === NET_CODE.length) {
+                netCodeIdx = 0;
+                launchNetworkVoid();
+            }
+        } else {
+            netCodeIdx = 0;
+        }
     });
+
+    function launchNetworkVoid() {
+        // Terminal-style flash before navigating
+        const flash = document.createElement('div');
+        flash.style.cssText = `
+            position:fixed;inset:0;z-index:999999;
+            background:#000;display:flex;align-items:center;justify-content:center;
+            flex-direction:column;gap:1rem;font-family:'Share Tech Mono',monospace;
+            animation:netFlash .6s ease forwards;
+        `;
+        flash.innerHTML = `
+            <div style="color:#00ff41;font-size:1.1rem;letter-spacing:4px;">// ACCESSING NETWORK VOID //</div>
+            <div style="color:#00c832;font-size:.8rem;letter-spacing:2px;">PROTOCOL INITIALIZED...</div>
+        `;
+        const style = document.createElement('style');
+        style.textContent = `@keyframes netFlash{0%{opacity:0}30%{opacity:1}85%{opacity:1}100%{opacity:0}}`;
+        document.head.appendChild(style);
+        document.body.appendChild(flash);
+        setTimeout(() => { window.location.href = 'network.html'; }, 700);
+    }
 
     if (konamiClose) {
         konamiClose.addEventListener('click', () => {
@@ -655,84 +694,60 @@
     }
 
     let konamiRaf = null;
-    let konamiParticles = [];
 
-    function triggerKonami() {
-        konamiEl.classList.add('show');
-
-        // Resize canvas
+    /* ── MATRIX RAIN BACKGROUND ── */
+    function startMatrixRain() {
         konamiCv.width  = window.innerWidth;
         konamiCv.height = window.innerHeight;
         konamiCv.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;';
 
-        // Spawn explosion particles
-        konamiParticles = [];
-        for (let i = 0; i < 300; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = 2 + Math.random() * 14;
-            const hue   = Math.random() * 60 + 20; // gold range
-            konamiParticles.push({
-                x: window.innerWidth / 2,
-                y: window.innerHeight / 2,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1,
-                decay: 0.008 + Math.random() * 0.015,
-                size: 3 + Math.random() * 10,
-                color: `hsl(${hue}, 100%, ${50 + Math.random() * 30}%)`,
-                char: ['🐾','⭐','✨','💫','🌟','🔥','⚡','🌀'][Math.floor(Math.random() * 8)],
-                isEmoji: Math.random() > 0.6,
-            });
-        }
-
         const kCtx = konamiCv.getContext('2d');
-        const animate = () => {
+        const FONT_SIZE = 14;
+        const cols = Math.floor(konamiCv.width / FONT_SIZE);
+        // Matrix chars: katakana + latin + digits
+        const matrixChars = 'ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>[]{}|';
+        const drops = Array.from({ length: cols }, () => Math.random() * -100);
+
+        function drawMatrix() {
             if (!konamiEl.classList.contains('show')) return;
-            kCtx.fillStyle = 'rgba(0,0,0,0.15)';
+
+            // Fade previous frame — creates the trailing effect
+            kCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             kCtx.fillRect(0, 0, konamiCv.width, konamiCv.height);
 
-            konamiParticles.forEach(p => {
-                p.x  += p.vx;
-                p.y  += p.vy;
-                p.vy += 0.2; // gravity
-                p.life -= p.decay;
-                if (p.life <= 0) return;
+            kCtx.font = FONT_SIZE + 'px monospace';
 
-                kCtx.globalAlpha = p.life;
-                if (p.isEmoji) {
-                    kCtx.font = `${p.size * 2}px serif`;
-                    kCtx.fillText(p.char, p.x, p.y);
+            for (let i = 0; i < drops.length; i++) {
+                const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                const x = i * FONT_SIZE;
+                const y = drops[i] * FONT_SIZE;
+
+                // Bright white for the leading char, green for trail
+                if (drops[i] * FONT_SIZE > 0 && Math.random() > 0.975) {
+                    kCtx.fillStyle = '#ffffff';
                 } else {
-                    kCtx.beginPath();
-                    kCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                    kCtx.fillStyle = p.color;
-                    kCtx.fill();
+                    // Vary green intensity for depth
+                    const brightness = Math.floor(100 + Math.random() * 155);
+                    kCtx.fillStyle = `rgb(0, ${brightness}, 0)`;
                 }
-            });
-            kCtx.globalAlpha = 1;
-            konamiParticles = konamiParticles.filter(p => p.life > 0);
+                kCtx.fillText(char, x, y);
 
-            // Keep spawning while overlay is shown
-            if (konamiParticles.length < 50 && konamiEl.classList.contains('show')) {
-                for (let i = 0; i < 20; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = 2 + Math.random() * 10;
-                    const hue   = Math.random() * 360;
-                    konamiParticles.push({
-                        x: window.innerWidth / 2, y: window.innerHeight / 2,
-                        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 3,
-                        life: 1, decay: 0.01 + Math.random() * 0.015,
-                        size: 3 + Math.random() * 8,
-                        color: `hsl(${hue}, 100%, 60%)`,
-                        char: ['🐾','⭐','✨','💫','🌟','🔥','⚡','🌀'][Math.floor(Math.random() * 8)],
-                        isEmoji: Math.random() > 0.5,
-                    });
+                // Reset column to top when it goes off screen
+                if (y > konamiCv.height && Math.random() > 0.975) {
+                    drops[i] = 0;
                 }
+                drops[i] += 0.5;
             }
 
-            konamiRaf = requestAnimationFrame(animate);
-        };
-        animate();
+            konamiRaf = requestAnimationFrame(drawMatrix);
+        }
+
+        drawMatrix();
+    }
+
+    function triggerKonami() {
+        konamiEl.classList.add('show');
+        startMatrixRain();
 
         // Populate sysinfo when void opens
         voidSysInfo();
@@ -823,5 +838,220 @@
             set('conv-ascii', (n >= 32 && n <= 126) ? `'${String.fromCharCode(n)}'` : (n < 32 ? 'ctrl char' : 'non-printable'));
         });
     }
+
+    /* ====================================================
+       GRIMOIRE — HOVER 30S SUR GIACOMO → LOGIN SECRET
+    ==================================================== */
+    (function() {
+        const portrait = document.getElementById('portrait-trigger');
+        if (!portrait) return;
+
+        const HOVER_DURATION = 30000; // 30 secondes
+        const SECRET_PASSWORD = 'RONRONNEMENT';
+
+        let hoverTimer  = null;
+        let hoverStart  = null;
+        let rafId       = null;
+
+        /* ── Barre de progression secrète ── */
+        const progressWrap = document.createElement('div');
+        progressWrap.id = 'grimoire-progress';
+        progressWrap.style.cssText = `
+            position:absolute;bottom:-6px;left:0;width:100%;height:3px;
+            background:rgba(0,0,0,.3);border-radius:2px;overflow:hidden;
+            opacity:0;transition:opacity .3s;pointer-events:none;
+        `;
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            height:100%;width:0%;
+            background:linear-gradient(to right,#c8941e,#f0c060);
+            box-shadow:0 0 6px rgba(200,148,30,.8);
+            transition:none;
+        `;
+        progressWrap.appendChild(progressBar);
+
+        const imageContainer = document.getElementById('secret-portrait');
+        if (imageContainer) {
+            imageContainer.style.position = 'relative';
+            imageContainer.appendChild(progressWrap);
+        }
+
+        /* ── Modal de login ── */
+        const modal = document.createElement('div');
+        modal.id = 'grimoire-modal';
+        modal.style.cssText = `
+            position:fixed;inset:0;z-index:99999;
+            display:none;align-items:center;justify-content:center;
+            background:rgba(0,0,0,.92);backdrop-filter:blur(4px);
+            font-family:'Cinzel',Georgia,serif;
+        `;
+        modal.innerHTML = `
+            <div id="grimoire-box" style="
+                border:1px solid #c8941e;
+                background:linear-gradient(135deg,#0d0900,#1a1208);
+                padding:2.5rem 2rem;
+                max-width:420px;width:90%;
+                text-align:center;
+                box-shadow:0 0 60px rgba(200,148,30,.25),inset 0 0 40px rgba(0,0,0,.5);
+                animation:grimoireAppear .4s ease;
+            ">
+                <div style="font-size:2.5rem;margin-bottom:1rem;
+                    filter:drop-shadow(0 0 12px rgba(200,148,30,.7));">𖤐</div>
+
+                <div style="font-size:.65rem;letter-spacing:5px;color:#8b6310;margin-bottom:.5rem;">
+                    ACCÈS RESTREINT
+                </div>
+                <h2 style="font-size:1.2rem;color:#f0c060;margin-bottom:.3rem;letter-spacing:3px;">
+                    GRIMOIRE PRIMORDIAL
+                </h2>
+                <p style="font-size:.75rem;color:#6b5030;margin-bottom:1.8rem;letter-spacing:1px;">
+                    Seuls les Élus connaissent le mot sacré.
+                </p>
+
+                <div style="position:relative;margin-bottom:1rem;">
+                    <input id="grimoire-pw" type="password"
+                        placeholder="Mot sacré..."
+                        autocomplete="off"
+                        style="
+                            width:100%;padding:.7rem 1rem;
+                            background:rgba(200,148,30,.06);
+                            border:1px solid #8b6310;
+                            color:#e8d8b0;
+                            font-family:'Cinzel',serif;
+                            font-size:.95rem;
+                            text-align:center;
+                            outline:none;
+                            letter-spacing:4px;
+                            transition:border-color .2s,box-shadow .2s;
+                        ">
+                </div>
+
+                <div id="grimoire-err" style="color:#8b1a1a;font-size:.75rem;min-height:1rem;margin-bottom:.8rem;opacity:0;transition:opacity .2s;"></div>
+
+                <button id="grimoire-submit" style="
+                    background:transparent;border:1px solid #c8941e;
+                    color:#c8941e;font-family:'Cinzel',serif;
+                    font-size:.8rem;letter-spacing:3px;
+                    padding:.6rem 2rem;cursor:pointer;
+                    transition:all .2s;margin-right:.5rem;
+                ">ENTRER</button>
+
+                <button id="grimoire-cancel" style="
+                    background:transparent;border:1px solid #3a2a10;
+                    color:#6b5030;font-family:'Cinzel',serif;
+                    font-size:.8rem;letter-spacing:2px;
+                    padding:.6rem 1.2rem;cursor:pointer;
+                    transition:all .2s;
+                ">✕</button>
+
+                <p style="font-size:.6rem;color:#3a2510;margin-top:1.5rem;letter-spacing:1px;">
+                    Le mot est dissimulé dans les écrits du Primordial.
+                </p>
+            </div>
+            <style>
+                @keyframes grimoireAppear {
+                    from { opacity:0; transform:scale(.92) translateY(10px); }
+                    to   { opacity:1; transform:scale(1)  translateY(0); }
+                }
+                #grimoire-pw:focus { border-color:#c8941e !important; box-shadow:0 0 12px rgba(200,148,30,.25) !important; }
+                #grimoire-submit:hover { background:#c8941e !important; color:#000 !important; }
+                #grimoire-cancel:hover { border-color:#6b5030 !important; color:#a08060 !important; }
+            </style>
+        `;
+        document.body.appendChild(modal);
+
+        const pwInput     = document.getElementById('grimoire-pw');
+        const errEl       = document.getElementById('grimoire-err');
+        const submitBtn   = document.getElementById('grimoire-submit');
+        const cancelBtn   = document.getElementById('grimoire-cancel');
+
+        function showError(msg) {
+            errEl.textContent = msg;
+            errEl.style.opacity = '1';
+            pwInput.style.borderColor = '#8b1a1a';
+            setTimeout(() => {
+                errEl.style.opacity = '0';
+                pwInput.style.borderColor = '#8b6310';
+            }, 2500);
+        }
+
+        function tryLogin() {
+            const val = (pwInput.value || '').toUpperCase().trim();
+            if (val === SECRET_PASSWORD) {
+                // Flash doré puis redirect
+                const flash = document.createElement('div');
+                flash.style.cssText = `
+                    position:fixed;inset:0;z-index:9999999;
+                    background:#0d0900;
+                    display:flex;flex-direction:column;
+                    align-items:center;justify-content:center;gap:1rem;
+                    font-family:'Cinzel',serif;
+                `;
+                flash.innerHTML = `
+                    <div style="font-size:3rem;animation:pulse 1s infinite;">𖤐</div>
+                    <div style="color:#f0c060;letter-spacing:4px;font-size:1rem;">LES ARCHIVES S'OUVRENT...</div>
+                    <style>@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}</style>
+                `;
+                document.body.appendChild(flash);
+                setTimeout(() => { window.location.href = 'grimoire.html'; }, 1200);
+            } else {
+                pwInput.value = '';
+                showError('✗ Le Primordial rejette cette offrande.');
+                // Shake the box
+                const box = document.getElementById('grimoire-box');
+                box.style.animation = 'none';
+                box.style.transform = 'translateX(-8px)';
+                setTimeout(() => box.style.transform = 'translateX(8px)', 80);
+                setTimeout(() => box.style.transform = 'translateX(-5px)', 160);
+                setTimeout(() => box.style.transform = 'translateX(0)', 240);
+            }
+        }
+
+        function openModal() {
+            modal.style.display = 'flex';
+            setTimeout(() => pwInput.focus(), 100);
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            pwInput.value = '';
+            errEl.style.opacity = '0';
+        }
+
+        submitBtn.addEventListener('click', tryLogin);
+        cancelBtn.addEventListener('click', closeModal);
+        pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        /* ── Hover detection ── */
+        function updateProgress() {
+            if (!hoverStart) return;
+            const elapsed = Date.now() - hoverStart;
+            const pct = Math.min((elapsed / HOVER_DURATION) * 100, 100);
+            progressBar.style.width = pct + '%';
+            if (elapsed >= HOVER_DURATION) {
+                cancelAnimationFrame(rafId);
+                progressWrap.style.opacity = '0';
+                progressBar.style.width = '0%';
+                openModal();
+                return;
+            }
+            rafId = requestAnimationFrame(updateProgress);
+        }
+
+        portrait.addEventListener('mouseenter', () => {
+            hoverStart = Date.now();
+            progressWrap.style.opacity = '1';
+            rafId = requestAnimationFrame(updateProgress);
+        });
+
+        portrait.addEventListener('mouseleave', () => {
+            hoverStart = null;
+            cancelAnimationFrame(rafId);
+            progressBar.style.width = '0%';
+            progressWrap.style.opacity = '0';
+        });
+
+    })();
 
 })();

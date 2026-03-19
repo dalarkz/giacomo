@@ -352,4 +352,296 @@
         });
     }
 
+
+    /* ====================================================
+       HOROSCOPE DE GIACOMO
+    ==================================================== */
+    const SIGNS = [
+        { name:'BÉLIER',    emoji:'♈', date:'21 Mar – 19 Avr', el:'Feu',  planet:'Chaos' },
+        { name:'TAUREAU',   emoji:'♉', date:'20 Avr – 20 Mai', el:'Terre', planet:'Tuna' },
+        { name:'GÉMEAUX',   emoji:'♊', date:'21 Mai – 20 Jun', el:'Air',   planet:'Laser' },
+        { name:'CANCER',    emoji:'♋', date:'21 Jun – 22 Jul', el:'Eau',  planet:'Boîte' },
+        { name:'LION',      emoji:'♌', date:'23 Jul – 22 Aoû', el:'Feu',  planet:'Soleil' },
+        { name:'VIERGE',    emoji:'♍', date:'23 Aoû – 22 Sep', el:'Terre', planet:'Litière' },
+        { name:'BALANCE',   emoji:'♎', date:'23 Sep – 22 Oct', el:'Air',   planet:'Bol' },
+        { name:'SCORPION',  emoji:'♏', date:'23 Oct – 21 Nov', el:'Eau',  planet:'Ombre' },
+        { name:'SAGITTAIRE',emoji:'♐', date:'22 Nov – 21 Déc', el:'Feu',  planet:'Comète' },
+        { name:'CAPRICORNE',emoji:'♑', date:'22 Déc – 19 Jan', el:'Terre', planet:'Griffes' },
+        { name:'VERSEAU',   emoji:'♒', date:'20 Jan – 18 Fév', el:'Air',   planet:'Vide' },
+        { name:'POISSONS',  emoji:'♓', date:'19 Fév – 20 Mar', el:'Eau',  planet:'Thon' },
+    ];
+
+    const HORO_TEXTS = [
+        "Les astres s'alignent en votre faveur. Giacomo a daigné tourner la tête dans votre direction. Profitez de cette rareté cosmique avant qu'il ne se rendorme.",
+        "Mercure est rétrograde. Giacomo est catrograde, ce qui est pire. Évitez les décisions importantes, les chiens, et tout ce qui grince.",
+        "Une opportunité se présente. Giacomo l'a déjà évaluée et jugée insuffisamment tunaesque. Mais vous, allez-y, faites ce qu'il faut.",
+        "Votre énergie est en hausse. Malheureusement, Giacomo dort sur la prise de courant de l'univers. Attendez qu'il bouge.",
+        "Les forces du vide vous observent. C'est Giacomo. Il juge votre posture. Redressez-vous.",
+        "Une période de transformation s'amorce. Giacomo appelle ça 'changer de canapé'. Les effets sont cosmiquement équivalents.",
+        "La lune de Giacomo est en phase de grattage de dossier. Vos projets créatifs avanceront si vous offrez du thon premium.",
+        "Les étoiles forment la forme d'un bol vide. C'est un avertissement direct. Remplissez-le avant la tombée de la nuit.",
+        "Votre charme est au maximum. Giacomo l'ignore, mais les autres mortels le perçoivent. C'est déjà bien.",
+        "Un voyage inattendu vous attend. Giacomo y sera déjà, invisible, à juger la qualité de vos bagages.",
+        "La sagesse ancienne dit : restez calme. Giacomo, lui, dit rien. Il pousse votre verre du bord. Message reçu.",
+        "Une rencontre importante approche. Elle sera moins importante que Giacomo, mais plus importante que tout le reste.",
+        "L'univers conspire en votre faveur. Giacomo n'est pas impliqué. Il conspirait mais il s'est endormi à mi-chemin.",
+        "Vos intuitions sont fiables aujourd'hui. Giacomo aussi l'a senti — il a fait demi-tour à la porte sans raison. C'est un signe.",
+        "Le chaos est votre allié ce jour. Giacomo approuve. Le chaos constructif est la seule philosophie valide.",
+    ];
+
+    const LUCKY_ITEMS = ['Thon', 'Laser rouge', '3h du matin', 'Griffes aiguisées', 'Sieste cosmique', 'Ronronnement', 'Boîte en carton', 'Fenêtre ouverte', 'Couverture chaude', 'Chaos organisé'];
+    const LUCKY_COLORS = ['Noir profond', 'Or cosmique', 'Pourpre astral', 'Rouge feu', 'Vert vide', 'Blanc stellaire', 'Ambre félin'];
+    const LUCKY_NUMS   = [3, 7, 9, 13, 42, 99, 666, 1337, 9999];
+
+    function seededRand(seed, max) {
+        const x = Math.sin(seed + 1) * 10000;
+        return Math.floor((x - Math.floor(x)) * max);
+    }
+
+    function getStars(seed) {
+        const n = (seededRand(seed, 3) + 3); // 3 to 5
+        return '★'.repeat(n) + '☆'.repeat(5 - n);
+    }
+
+    function showHoroscope(signIdx) {
+        const sign = SIGNS[signIdx];
+        const today = new Date();
+        // Seed = sign + day of year, so each sign gets different text each day
+        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+        const seed = signIdx * 31 + dayOfYear;
+
+        const text  = HORO_TEXTS[seededRand(seed, HORO_TEXTS.length)];
+        const item  = LUCKY_ITEMS[seededRand(seed + 1, LUCKY_ITEMS.length)];
+        const color = LUCKY_COLORS[seededRand(seed + 2, LUCKY_COLORS.length)];
+        const num   = LUCKY_NUMS[seededRand(seed + 3, LUCKY_NUMS.length)];
+        const stars = getStars(seed);
+
+        document.querySelectorAll('.horoscope-sign-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.horoscope-sign-btn')[signIdx].classList.add('active');
+
+        const resultEl = document.getElementById('horoscope-result');
+        resultEl.style.display = 'none';
+        requestAnimationFrame(() => {
+            document.getElementById('horoscope-result-sign').textContent = sign.emoji;
+            document.getElementById('horoscope-result-name').textContent = sign.name + ' — ' + sign.date;
+            document.getElementById('horoscope-stars').innerHTML =
+                `<span style="color:var(--primary)">${stars}</span>`;
+            document.getElementById('horoscope-text').textContent = `"${text}"`;
+            document.getElementById('horoscope-lucky').innerHTML = `
+                <div class="horo-lucky-item"><span class="horo-lucky-label">🍀 CHANCEUX</span><span class="horo-lucky-val">${item}</span></div>
+                <div class="horo-lucky-item"><span class="horo-lucky-label">🎨 COULEUR</span><span class="horo-lucky-val">${color}</span></div>
+                <div class="horo-lucky-item"><span class="horo-lucky-label">🔢 NOMBRE</span><span class="horo-lucky-val">${num}</span></div>
+                <div class="horo-lucky-item"><span class="horo-lucky-label">🪐 PLANÈTE</span><span class="horo-lucky-val">${sign.planet}</span></div>
+            `;
+            resultEl.style.display = 'block';
+        });
+    }
+
+    // Build sign buttons
+    const signsContainer = document.getElementById('horoscope-signs');
+    if (signsContainer) {
+        SIGNS.forEach((sign, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'horoscope-sign-btn';
+            btn.innerHTML = `<span class="sign-emoji">${sign.emoji}</span><span>${sign.name}</span>`;
+            btn.addEventListener('click', () => showHoroscope(i));
+            signsContainer.appendChild(btn);
+        });
+        // Auto-show today's matching sign (roughly based on current date)
+        const m = new Date().getMonth() + 1;
+        const d = new Date().getDate();
+        const autoIdx = [
+            [3,21],[4,20],[5,21],[6,21],[7,23],[8,23],
+            [9,23],[10,23],[11,22],[12,22],[1,20],[2,19]
+        ].findIndex(([mo, day]) => m === mo && d >= day || (m === mo + 1 && d < day));
+        showHoroscope(autoIdx >= 0 ? autoIdx : 0);
+    }
+
+
+    /* ====================================================
+       YEUX GÉANTS DE GIACOMO
+       Apparaît au hover des sections testimonials/timeline
+    ==================================================== */
+    (function() {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'giant-eyes-overlay';
+        overlay.innerHTML = `
+            <div class="giant-eye" id="eye-left">
+                <div class="eye-white">
+                    <div class="eye-iris"></div>
+                    <div class="eye-pupil" id="pupil-left"></div>
+                </div>
+            </div>
+            <div class="giant-eye" id="eye-right">
+                <div class="eye-white">
+                    <div class="eye-iris"></div>
+                    <div class="eye-pupil" id="pupil-right"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const pupilL = document.getElementById('pupil-left');
+        const pupilR = document.getElementById('pupil-right');
+
+        let eyeTimeout = null;
+        let eyesShowing = false;
+
+        // Track mouse to move pupils
+        document.addEventListener('mousemove', (e) => {
+            if (!eyesShowing) return;
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            const dx = (e.clientX - cx) / window.innerWidth;
+            const dy = (e.clientY - cy) / window.innerHeight;
+            const move = 'translate(' + (dx * 12) + 'px,' + (dy * 8) + 'px)';
+            pupilL.style.transform = move;
+            pupilR.style.transform = move;
+        });
+
+        function showEyes(duration = 3500) {
+            clearTimeout(eyeTimeout);
+            overlay.classList.add('eyes-visible');
+            eyesShowing = true;
+            eyeTimeout = setTimeout(() => {
+                overlay.classList.remove('eyes-visible');
+                eyesShowing = false;
+                pupilL.style.transform = '';
+                pupilR.style.transform = '';
+            }, duration);
+        }
+
+        // Trigger zones: testimonials + timeline sections
+        const triggerSelectors = [
+            '.testimonials-section',
+            '.timeline-section',
+            '.domains',
+        ];
+        triggerSelectors.forEach(sel => {
+            const el = document.querySelector(sel);
+            if (!el) return;
+            el.addEventListener('mouseenter', () => showEyes(4000));
+        });
+
+        // Also trigger randomly during oracle consultations
+        const oracleBox = document.querySelector('.oracle-box');
+        if (oracleBox) {
+            oracleBox.addEventListener('mouseenter', () => {
+                if (Math.random() > 0.5) showEyes(2500);
+            });
+        }
+    })();
+
+
+    /* ====================================================
+       MODE NUIT DES TEMPS
+       Déclenché par : triple-clic sur le copyright du footer
+    ==================================================== */
+    (function() {
+        const footerSecret = document.getElementById('footer-secret');
+        if (!footerSecret) return;
+
+        let clickCount = 0;
+        let clickTimer = null;
+        let nuitActive = false;
+        let symbolIntervals = [];
+
+        // Create overlay + toast
+        const nuitOverlay = document.createElement('div');
+        nuitOverlay.id = 'nuit-overlay';
+        document.body.appendChild(nuitOverlay);
+
+        const toast = document.createElement('div');
+        toast.id = 'nuit-toast';
+        document.body.appendChild(toast);
+
+        const ANCIENT_SYMBOLS = ['𖤐','𓂀','𓇽','☽','✦','⊕','⌘','𓆏','⋆','❋','҉','⁂','𝌆','☿','♆'];
+
+        function showToast(msg, duration = 3000) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        function spawnSymbol() {
+            const el = document.createElement('div');
+            el.className = 'nuit-symbol';
+            el.textContent = ANCIENT_SYMBOLS[Math.floor(Math.random() * ANCIENT_SYMBOLS.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.animationDuration = (8 + Math.random() * 12) + 's';
+            el.style.animationDelay = (Math.random() * 4) + 's';
+            el.style.fontSize = (1 + Math.random() * 2.5) + 'rem';
+            document.body.appendChild(el);
+            return el;
+        }
+
+        function activateNuit() {
+            nuitActive = true;
+            document.body.classList.add('nuit-des-temps');
+            nuitOverlay.classList.add('active');
+
+            // Spawn floating symbols
+            for (let i = 0; i < 18; i++) {
+                const sym = spawnSymbol();
+                symbolIntervals.push(sym);
+            }
+            // Continuously spawn more
+            const spawnInterval = setInterval(() => {
+                if (!nuitActive) { clearInterval(spawnInterval); return; }
+                const sym = spawnSymbol();
+                symbolIntervals.push(sym);
+                // Clean old ones
+                symbolIntervals = symbolIntervals.filter(s => {
+                    if (!document.body.contains(s)) return false;
+                    return true;
+                });
+            }, 2500);
+            symbolIntervals.push({ remove: () => clearInterval(spawnInterval) });
+
+            showToast('🌙 MODE NUIT DES TEMPS ACTIVÉ — L\'ancienne obscurité vous enveloppe.', 4000);
+        }
+
+        function deactivateNuit() {
+            nuitActive = false;
+            document.body.classList.remove('nuit-des-temps');
+            nuitOverlay.classList.remove('active');
+
+            // Remove symbols
+            document.querySelectorAll('.nuit-symbol').forEach(s => {
+                s.style.opacity = '0';
+                setTimeout(() => s.remove(), 600);
+            });
+            symbolIntervals = [];
+
+            showToast('🌅 Retour au présent. Giacomo referme l\'éternité.', 3000);
+        }
+
+        footerSecret.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimer);
+
+            if (clickCount === 1) {
+                // First click — subtle color hint
+                footerSecret.style.color = 'rgba(155,127,255,0.3)';
+                setTimeout(() => footerSecret.style.color = '', 300);
+            } else if (clickCount === 2) {
+                footerSecret.style.color = 'rgba(155,127,255,0.6)';
+                setTimeout(() => footerSecret.style.color = '', 300);
+            }
+
+            if (clickCount >= 3) {
+                clickCount = 0;
+                if (!nuitActive) activateNuit();
+                else deactivateNuit();
+                return;
+            }
+
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+                footerSecret.style.color = '';
+            }, 800);
+        });
+    })();
+
 })();

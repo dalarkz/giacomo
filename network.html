@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIACOMO :: NETWORK VOID</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green:    #00ff41;
+            --green-dim:#00c832;
+            --green-dark:#003a0f;
+            --bg:       #050f07;
+            --panel:    rgba(0,255,65,0.04);
+            --border:   rgba(0,255,65,0.18);
+            --border-h: rgba(0,255,65,0.55);
+            --text:     #b0ffb8;
+            --text-dim: #4a7a52;
+            --red:      #ff4444;
+            --orange:   #ff9900;
+            --blue:     #00cfff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── MATRIX CANVAS ── */
+        #matrix-bg {
+            position: fixed; inset: 0; z-index: 0;
+            pointer-events: none; opacity: 0.18;
+        }
+
+        /* ── LAYOUT ── */
+        .page-wrap {
+            position: relative; z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        /* ── HEADER ── */
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            position: absolute; top: 1.2rem; left: 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--green);
+            font-family: inherit;
+            font-size: .85rem;
+            padding: .4rem .9rem;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-btn:hover { background: var(--green); color: #000; border-color: var(--green); }
+
+        .header-badge {
+            font-size: .7rem;
+            color: var(--green-dim);
+            letter-spacing: 4px;
+            margin-bottom: .5rem;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.6rem, 4vw, 3rem);
+            color: var(--green);
+            text-shadow: 0 0 30px rgba(0,255,65,.5);
+            letter-spacing: 4px;
+        }
+        .header-sub {
+            color: var(--text-dim);
+            font-size: .8rem;
+            margin-top: .5rem;
+            letter-spacing: 2px;
+        }
+
+        /* ── TABS ── */
+        .tab-bar {
+            display: flex; flex-wrap: wrap; gap: .5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: .8rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: .8rem;
+            padding: .45rem 1rem;
+            cursor: pointer;
+            transition: all .2s;
+            letter-spacing: 1px;
+        }
+        .tab-btn:hover  { border-color: var(--green-dim); color: var(--green-dim); }
+        .tab-btn.active { border-color: var(--green); color: var(--green); background: rgba(0,255,65,.08); box-shadow: 0 0 10px rgba(0,255,65,.15); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── PANEL / CARD ── */
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: border-color .2s;
+        }
+        .card:hover { border-color: var(--border-h); }
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: .85rem;
+            color: var(--green);
+            letter-spacing: 2px;
+            margin-bottom: 1.2rem;
+            padding-bottom: .6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── FORM ELEMENTS ── */
+        .row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: flex-end; }
+        .field { display: flex; flex-direction: column; gap: .35rem; flex: 1; min-width: 160px; }
+        label { font-size: .75rem; color: var(--text-dim); letter-spacing: 1px; }
+        input[type="text"], input[type="number"], select {
+            background: rgba(0,255,65,.05);
+            border: 1px solid var(--border);
+            color: var(--green);
+            font-family: inherit;
+            font-size: .95rem;
+            padding: .55rem .8rem;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            width: 100%;
+        }
+        input:focus, select:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 8px rgba(0,255,65,.2);
+        }
+        select option { background: #0a1a0e; }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green);
+            font-family: inherit;
+            font-size: .85rem;
+            padding: .55rem 1.4rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .btn:hover { background: var(--green); color: #000; box-shadow: 0 0 15px rgba(0,255,65,.3); }
+        .btn-sm { padding: .3rem .8rem; font-size: .75rem; }
+
+        /* ── RESULTS ── */
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+        .result-item {
+            background: rgba(0,255,65,.04);
+            border: 1px solid rgba(0,255,65,.12);
+            padding: .8rem 1rem;
+        }
+        .result-label { font-size: .7rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: .3rem; }
+        .result-val {
+            font-size: 1rem;
+            color: var(--green);
+            word-break: break-all;
+        }
+        .result-val.highlight { color: #fff; text-shadow: 0 0 8px var(--green); }
+        .result-val.warn { color: var(--orange); }
+        .result-val.danger { color: var(--red); }
+        .result-val.blue { color: var(--blue); }
+
+        /* ── BINARY VISUALIZER ── */
+        .octets-wrap {
+            display: flex; flex-wrap: wrap; gap: 1rem;
+            margin-top: 1rem;
+        }
+        .octet-box {
+            flex: 1; min-width: 120px;
+            background: rgba(0,255,65,.03);
+            border: 1px solid var(--border);
+            padding: .8rem;
+            text-align: center;
+        }
+        .octet-label { font-size: .65rem; color: var(--text-dim); margin-bottom: .4rem; }
+        .octet-decimal { font-size: 1.4rem; color: var(--green); margin-bottom: .4rem; }
+        .octet-binary { display: flex; justify-content: center; gap: 2px; flex-wrap: wrap; }
+        .bit {
+            width: 18px; height: 22px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .8rem; font-weight: bold;
+            border: 1px solid rgba(0,255,65,.2);
+            transition: all .15s;
+        }
+        .bit.on  { background: rgba(0,255,65,.25); color: var(--green); border-color: var(--green); }
+        .bit.off { background: transparent; color: var(--text-dim); }
+        .bit-sep { width: 6px; }
+
+        /* ── CIDR TABLE ── */
+        .cidr-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+        .cidr-table th {
+            background: rgba(0,255,65,.1);
+            color: var(--green);
+            padding: .5rem .8rem;
+            text-align: left;
+            border: 1px solid var(--border);
+            letter-spacing: 1px;
+            font-size: .72rem;
+        }
+        .cidr-table td {
+            padding: .4rem .8rem;
+            border: 1px solid rgba(0,255,65,.08);
+            color: var(--text);
+        }
+        .cidr-table tr:hover td { background: rgba(0,255,65,.05); }
+        .cidr-table tr.class-a td { color: #ff9900; }
+        .cidr-table tr.class-b td { color: var(--blue); }
+        .cidr-table tr.class-c td { color: var(--green); }
+
+        /* ── SUBNET TABLE ── */
+        .subnet-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: 1rem; max-height: 400px; overflow-y: auto; display: block; }
+        .subnet-table th {
+            background: rgba(0,255,65,.1); color: var(--green);
+            padding: .45rem .7rem; border: 1px solid var(--border);
+            position: sticky; top: 0;
+        }
+        .subnet-table td { padding: .35rem .7rem; border: 1px solid rgba(0,255,65,.08); }
+        .subnet-table tr:nth-child(even) td { background: rgba(0,255,65,.02); }
+
+        /* ── IPV6 ── */
+        .ipv6-groups {
+            display: flex; flex-wrap: wrap; gap: .4rem;
+            margin-top: .8rem;
+        }
+        .ipv6-group {
+            padding: .3rem .6rem;
+            border: 1px solid var(--border);
+            font-size: .9rem;
+            color: var(--green);
+        }
+        .ipv6-group.zero { color: var(--text-dim); border-color: rgba(0,255,65,.06); }
+
+        /* ── ERROR ── */
+        .error-msg { color: var(--red); font-size: .8rem; margin-top: .6rem; min-height: 1.2rem; }
+
+        /* ── WILDCARD ── */
+        .wc-compare {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;
+        }
+        .wc-row {
+            display: flex; flex-direction: column; gap: .2rem;
+            padding: .7rem; border: 1px solid var(--border);
+        }
+        .wc-row-label { font-size: .65rem; color: var(--text-dim); }
+        .wc-row-val { font-size: .95rem; color: var(--green); }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,255,65,.3); }
+
+        @media(max-width:600px) {
+            .wc-compare { grid-template-columns: 1fr; }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<div class="page-wrap">
+    <header>
+        <a class="back-btn" href="index.html">⬅ RETURN</a>
+        <div class="header-badge">// GIACOMO :: CLASSIFIED TERMINAL //</div>
+        <h1>⬡ NETWORK VOID</h1>
+        <div class="header-sub">IP · SUBNET · BINARY · NETWORK ADDRESSING TOOLKIT</div>
+    </header>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="ipcalc">🌐 IP CALCULATOR</button>
+        <button class="tab-btn" data-tab="binary">🔢 BINARY VISUALIZER</button>
+        <button class="tab-btn" data-tab="subnetter">📡 SUBNET DIVIDER</button>
+        <button class="tab-btn" data-tab="wildcard">🃏 WILDCARD</button>
+        <button class="tab-btn" data-tab="ipv6">🌍 IPv6 TOOLS</button>
+        <button class="tab-btn" data-tab="cidrtable">📋 CIDR TABLE</button>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 1 — IP CALCULATOR
+    ════════════════════════════════════ -->
+    <div id="tab-ipcalc" class="tab-panel active">
+        <div class="card">
+            <div class="card-title">// IP / CIDR CALCULATOR</div>
+            <div class="row">
+                <div class="field">
+                    <label>IP ADDRESS</label>
+                    <input type="text" id="calc-ip" placeholder="e.g. 192.168.1.100" value="192.168.1.100">
+                </div>
+                <div class="field">
+                    <label>CIDR PREFIX OR SUBNET MASK</label>
+                    <input type="text" id="calc-mask" placeholder="e.g. /24 or 255.255.255.0" value="/24">
+                </div>
+                <button class="btn" onclick="calcIP()">CALCULATE</button>
+            </div>
+            <div class="error-msg" id="calc-err"></div>
+            <div class="result-grid" id="calc-results" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">// IP CONVERTER (IP ↔ DECIMAL ↔ HEX)</div>
+            <div class="row">
+                <div class="field">
+                    <label>IP ADDRESS</label>
+                    <input type="text" id="conv-ip" placeholder="e.g. 192.168.1.1" value="192.168.1.1">
+                </div>
+                <button class="btn" onclick="convertIP()">CONVERT</button>
+            </div>
+            <div class="error-msg" id="conv-err"></div>
+            <div class="result-grid" id="conv-results" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 2 — BINARY VISUALIZER
+    ════════════════════════════════════ -->
+    <div id="tab-binary" class="tab-panel">
+        <div class="card">
+            <div class="card-title">// IP → BINARY VISUALIZER</div>
+            <div class="row">
+                <div class="field">
+                    <label>IP ADDRESS</label>
+                    <input type="text" id="bin-ip" placeholder="e.g. 192.168.10.50" value="192.168.10.50" oninput="renderBinary()">
+                </div>
+                <div class="field">
+                    <label>SUBNET MASK / CIDR</label>
+                    <input type="text" id="bin-mask" placeholder="/24 or 255.255.255.0" value="/24" oninput="renderBinary()">
+                </div>
+            </div>
+            <div class="error-msg" id="bin-err"></div>
+            <div id="bin-output"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 3 — SUBNET DIVIDER
+    ════════════════════════════════════ -->
+    <div id="tab-subnetter" class="tab-panel">
+        <div class="card">
+            <div class="card-title">// SUBNET DIVIDER</div>
+            <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:1rem;">Split a network into equal subnets or calculate VLSM.</p>
+            <div class="row">
+                <div class="field">
+                    <label>NETWORK (CIDR)</label>
+                    <input type="text" id="sub-net" placeholder="e.g. 192.168.0.0/24" value="192.168.0.0/24">
+                </div>
+                <div class="field">
+                    <label>NEW PREFIX LENGTH</label>
+                    <input type="number" id="sub-newprefix" placeholder="e.g. 26" value="26" min="1" max="30">
+                </div>
+                <button class="btn" onclick="calcSubnets()">DIVIDE</button>
+            </div>
+            <div class="error-msg" id="sub-err"></div>
+            <div id="sub-summary" style="margin-top:.8rem;font-size:.85rem;color:var(--green-dim);"></div>
+            <div style="overflow-x:auto;">
+                <table class="subnet-table" id="sub-table" style="display:none;">
+                    <thead><tr>
+                        <th>#</th>
+                        <th>NETWORK</th>
+                        <th>FIRST HOST</th>
+                        <th>LAST HOST</th>
+                        <th>BROADCAST</th>
+                        <th>HOSTS</th>
+                    </tr></thead>
+                    <tbody id="sub-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 4 — WILDCARD
+    ════════════════════════════════════ -->
+    <div id="tab-wildcard" class="tab-panel">
+        <div class="card">
+            <div class="card-title">// WILDCARD MASK CALCULATOR</div>
+            <div class="row">
+                <div class="field">
+                    <label>SUBNET MASK OR CIDR</label>
+                    <input type="text" id="wc-mask" placeholder="255.255.255.0 or /24" value="/24">
+                </div>
+                <button class="btn" onclick="calcWildcard()">CALCULATE</button>
+            </div>
+            <div class="error-msg" id="wc-err"></div>
+            <div class="wc-compare" id="wc-results" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">// SUBNET MASK REFERENCE</div>
+            <div class="result-grid" id="wc-ref"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 5 — IPv6
+    ════════════════════════════════════ -->
+    <div id="tab-ipv6" class="tab-panel">
+        <div class="card">
+            <div class="card-title">// IPv6 EXPAND / COMPRESS</div>
+            <div class="row">
+                <div class="field">
+                    <label>IPv6 ADDRESS</label>
+                    <input type="text" id="ipv6-input" placeholder="e.g. 2001:db8::1 or full" value="2001:db8::1">
+                </div>
+                <button class="btn" onclick="processIPv6()">PROCESS</button>
+            </div>
+            <div class="error-msg" id="ipv6-err"></div>
+            <div id="ipv6-results" style="display:none;margin-top:1rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">// IPv6 ADDRESS TYPES REFERENCE</div>
+            <div class="result-grid">
+                <div class="result-item"><div class="result-label">LOOPBACK</div><div class="result-val blue">::1</div></div>
+                <div class="result-item"><div class="result-label">LINK-LOCAL</div><div class="result-val blue">fe80::/10</div></div>
+                <div class="result-item"><div class="result-label">UNIQUE LOCAL</div><div class="result-val blue">fc00::/7</div></div>
+                <div class="result-item"><div class="result-label">MULTICAST</div><div class="result-val blue">ff00::/8</div></div>
+                <div class="result-item"><div class="result-label">GLOBAL UNICAST</div><div class="result-val blue">2000::/3</div></div>
+                <div class="result-item"><div class="result-label">DOCUMENTATION</div><div class="result-val blue">2001:db8::/32</div></div>
+                <div class="result-item"><div class="result-label">6TO4</div><div class="result-val blue">2002::/16</div></div>
+                <div class="result-item"><div class="result-label">UNSPECIFIED</div><div class="result-val blue">::</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         TAB 6 — CIDR TABLE
+    ════════════════════════════════════ -->
+    <div id="tab-cidrtable" class="tab-panel">
+        <div class="card">
+            <div class="card-title">// COMPLETE CIDR REFERENCE TABLE /0 → /32</div>
+            <div style="overflow-x:auto;">
+                <table class="cidr-table" id="cidr-table-full"></table>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+/* ══════════════════════════════════════════════
+   MATRIX BACKGROUND
+══════════════════════════════════════════════ */
+(function(){
+    const cv = document.getElementById('matrix-bg');
+    const cx = cv.getContext('2d');
+    const chars = 'ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEF';
+    const FS = 13;
+    let drops = [];
+    function resize(){
+        cv.width = window.innerWidth;
+        cv.height = window.innerHeight;
+        drops = Array.from({length: Math.floor(cv.width/FS)}, () => Math.random()*-80);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    function draw(){
+        cx.fillStyle = 'rgba(5,15,7,0.06)';
+        cx.fillRect(0,0,cv.width,cv.height);
+        cx.font = FS+'px monospace';
+        for(let i=0;i<drops.length;i++){
+            cx.fillStyle = '#00ff41';
+            cx.fillText(chars[Math.floor(Math.random()*chars.length)], i*FS, drops[i]*FS);
+            if(drops[i]*FS > cv.height && Math.random()>.975) drops[i]=0;
+            drops[i]+=0.5;
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function ipToInt(ip) {
+    const parts = ip.trim().split('.');
+    if(parts.length !== 4) return null;
+    let n = 0;
+    for(let p of parts){
+        const v = parseInt(p);
+        if(isNaN(v) || v<0 || v>255) return null;
+        n = (n<<8) + v;
+    }
+    return n >>> 0;
+}
+function intToIp(n) {
+    return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+}
+function cidrToMask(cidr) {
+    if(cidr < 0 || cidr > 32) return null;
+    return cidr === 0 ? 0 : (0xffffffff << (32-cidr)) >>> 0;
+}
+function maskToCidr(mask) {
+    let c = 0, m = mask >>> 0;
+    while(m & 0x80000000){ c++; m = (m<<1)>>>0; }
+    return c;
+}
+function parseMaskOrCidr(str) {
+    str = str.trim();
+    if(str.startsWith('/')) {
+        const c = parseInt(str.slice(1));
+        if(isNaN(c)) return null;
+        return { cidr: c, mask: cidrToMask(c) };
+    }
+    const m = ipToInt(str);
+    if(m === null) return null;
+    return { cidr: maskToCidr(m), mask: m };
+}
+function toBinaryStr(n) {
+    return ('00000000000000000000000000000000' + (n>>>0).toString(2)).slice(-32);
+}
+function numHosts(cidr) {
+    if(cidr >= 31) return cidr===31?2:1;
+    return Math.pow(2, 32-cidr) - 2;
+}
+function formatNum(n){ return n.toLocaleString('en-US'); }
+
+function ipClass(ip) {
+    const first = (ip>>>24)&255;
+    if(first < 128) return 'A';
+    if(first < 192) return 'B';
+    if(first < 224) return 'C';
+    if(first < 240) return 'D (Multicast)';
+    return 'E (Reserved)';
+}
+function isPrivate(ipInt) {
+    const a=(ipInt>>>24)&255, b=(ipInt>>>16)&255;
+    if(a===10) return true;
+    if(a===172 && b>=16 && b<=31) return true;
+    if(a===192 && b===168) return true;
+    return false;
+}
+
+/* ══════════════════════════════════════════════
+   TAB 1 — IP CALCULATOR
+══════════════════════════════════════════════ */
+function calcIP() {
+    const ipStr  = document.getElementById('calc-ip').value.trim();
+    const mStr   = document.getElementById('calc-mask').value.trim();
+    const errEl  = document.getElementById('calc-err');
+    const resEl  = document.getElementById('calc-results');
+    errEl.textContent = '';
+    resEl.style.display = 'none';
+
+    const ipInt = ipToInt(ipStr);
+    if(ipInt === null){ errEl.textContent = '✗ Invalid IP address'; return; }
+
+    const parsed = parseMaskOrCidr(mStr);
+    if(!parsed || parsed.cidr < 0 || parsed.cidr > 32){ errEl.textContent = '✗ Invalid mask/CIDR'; return; }
+
+    const { cidr, mask } = parsed;
+    const network   = (ipInt & mask) >>> 0;
+    const broadcast = (network | (~mask >>> 0)) >>> 0;
+    const first     = cidr < 31 ? network + 1 : network;
+    const last      = cidr < 31 ? broadcast - 1 : broadcast;
+    const hosts     = numHosts(cidr);
+    const wild      = (~mask) >>> 0;
+
+    const items = [
+        { label:'IP ADDRESS',          val: ipStr,             cls:'' },
+        { label:'NETWORK ADDRESS',      val: intToIp(network),  cls:'highlight' },
+        { label:'BROADCAST',            val: intToIp(broadcast),cls:'warn' },
+        { label:'FIRST HOST',           val: intToIp(first),    cls:'' },
+        { label:'LAST HOST',            val: intToIp(last),     cls:'' },
+        { label:'SUBNET MASK',          val: intToIp(mask),     cls:'' },
+        { label:'WILDCARD MASK',        val: intToIp(wild),     cls:'' },
+        { label:'CIDR NOTATION',        val: intToIp(network)+'/'+cidr, cls:'highlight' },
+        { label:'USABLE HOSTS',         val: formatNum(hosts),  cls:'' },
+        { label:'TOTAL ADDRESSES',      val: formatNum(Math.pow(2,32-cidr)), cls:'' },
+        { label:'IP CLASS',             val: ipClass(ipInt),    cls:'blue' },
+        { label:'PRIVATE RANGE',        val: isPrivate(ipInt)?'YES — RFC1918':'NO — Public', cls: isPrivate(ipInt)?'':'warn' },
+        { label:'IP IN BINARY (32-bit)',val: toBinaryStr(ipInt).replace(/(.{8})/g,'$1 ').trim(), cls:'blue' },
+        { label:'NETWORK IN BINARY',    val: toBinaryStr(network).replace(/(.{8})/g,'$1 ').trim(), cls:'' },
+    ];
+
+    resEl.innerHTML = items.map(i =>
+        `<div class="result-item">
+            <div class="result-label">${i.label}</div>
+            <div class="result-val ${i.cls}">${i.val}</div>
+         </div>`
+    ).join('');
+    resEl.style.display = 'grid';
+}
+
+function convertIP() {
+    const ipStr = document.getElementById('conv-ip').value.trim();
+    const errEl = document.getElementById('conv-err');
+    const resEl = document.getElementById('conv-results');
+    errEl.textContent = '';
+    resEl.style.display = 'none';
+
+    const ipInt = ipToInt(ipStr);
+    if(ipInt === null){ errEl.textContent = '✗ Invalid IP address'; return; }
+
+    const items = [
+        { label:'DOTTED DECIMAL',   val: ipStr },
+        { label:'32-bit INTEGER',   val: ipInt.toString() },
+        { label:'HEXADECIMAL',      val: '0x' + ipInt.toString(16).toUpperCase().padStart(8,'0') },
+        { label:'BINARY',           val: toBinaryStr(ipInt).replace(/(.{8})/g,'$1 ').trim() },
+        { label:'OCTAL',            val: '0o' + ipInt.toString(8) },
+        { label:'4×HEX OCTETS',    val: ipStr.split('.').map(o=>(+o).toString(16).padStart(2,'0').toUpperCase()).join(':') },
+    ];
+
+    resEl.innerHTML = items.map(i =>
+        `<div class="result-item">
+            <div class="result-label">${i.label}</div>
+            <div class="result-val blue">${i.val}</div>
+         </div>`
+    ).join('');
+    resEl.style.display = 'grid';
+}
+
+/* ══════════════════════════════════════════════
+   TAB 2 — BINARY VISUALIZER
+══════════════════════════════════════════════ */
+function renderBinary() {
+    const ipStr  = document.getElementById('bin-ip').value.trim();
+    const mStr   = document.getElementById('bin-mask').value.trim();
+    const errEl  = document.getElementById('bin-err');
+    const out    = document.getElementById('bin-output');
+    errEl.textContent = '';
+    out.innerHTML = '';
+
+    const ipInt = ipToInt(ipStr);
+    if(!ipInt && ipInt !== 0){ errEl.textContent = '✗ Invalid IP'; return; }
+
+    const parsed = mStr ? parseMaskOrCidr(mStr) : null;
+    const cidr   = parsed ? parsed.cidr : null;
+    const mask   = parsed ? parsed.mask : null;
+    const network  = mask !== null ? (ipInt & mask)>>>0 : null;
+    const broadcast= mask !== null ? (network | (~mask>>>0))>>>0 : null;
+
+    function buildOctetBoxes(label, val, color, maskBits) {
+        const octets = [(val>>>24)&255,(val>>>16)&255,(val>>>8)&255,val&255];
+        const binStr = toBinaryStr(val);
+        let html = `<div style="margin-bottom:.5rem;font-size:.7rem;color:var(--text-dim);letter-spacing:2px;">${label}</div>`;
+        html += '<div class="octets-wrap">';
+        for(let o=0;o<4;o++){
+            html += `<div class="octet-box">
+                <div class="octet-label">OCTET ${o+1}</div>
+                <div class="octet-decimal" style="color:${color}">${octets[o]}</div>
+                <div class="octet-binary">`;
+            for(let b=0;b<8;b++){
+                const bitIdx = o*8+b;
+                const bitVal = binStr[bitIdx];
+                const isNetwork = maskBits !== null && bitIdx < maskBits;
+                const cls = bitVal==='1'?'on':'off';
+                const borderColor = isNetwork ? 'rgba(0,255,65,.6)' : 'rgba(100,100,100,.3)';
+                html += `<div class="bit ${cls}" title="bit ${31-bitIdx}" style="border-color:${borderColor}">${bitVal}</div>`;
+                if(b===3) html += '<div class="bit-sep"></div>';
+            }
+            html += '</div></div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    let html = '';
+    html += buildOctetBoxes('IP ADDRESS — ' + ipStr, ipInt, '#00ff41', cidr);
+    if(mask !== null){
+        html += '<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0;">';
+        html += buildOctetBoxes('SUBNET MASK — ' + intToIp(mask) + ' (/' + cidr + ')', mask, '#00cfff', null);
+        html += '<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0;">';
+        html += buildOctetBoxes('NETWORK ADDRESS — ' + intToIp(network), network, '#ff9900', cidr);
+        html += '<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0;">';
+        html += buildOctetBoxes('BROADCAST — ' + intToIp(broadcast), broadcast, '#ff4444', null);
+        html += `<div style="margin-top:1rem;font-size:.78rem;color:var(--text-dim);">
+            <span style="border:1px solid rgba(0,255,65,.6);padding:2px 6px;margin-right:.5rem;">■</span> = NETWORK BITS &nbsp;&nbsp;
+            <span style="border:1px solid rgba(100,100,100,.3);padding:2px 6px;margin-right:.5rem;">■</span> = HOST BITS
+        </div>`;
+    }
+    out.innerHTML = html;
+}
+
+// Auto-render on load
+renderBinary();
+
+/* ══════════════════════════════════════════════
+   TAB 3 — SUBNET DIVIDER
+══════════════════════════════════════════════ */
+function calcSubnets() {
+    const netStr    = document.getElementById('sub-net').value.trim();
+    const newPrefix = parseInt(document.getElementById('sub-newprefix').value);
+    const errEl     = document.getElementById('sub-err');
+    const sumEl     = document.getElementById('sub-summary');
+    const tableEl   = document.getElementById('sub-table');
+    const tbody     = document.getElementById('sub-tbody');
+    errEl.textContent = ''; sumEl.textContent = ''; tableEl.style.display='none';
+
+    const parts = netStr.split('/');
+    if(parts.length !== 2){ errEl.textContent='✗ Use CIDR format: x.x.x.x/n'; return; }
+    const baseIp = ipToInt(parts[0]);
+    const baseCidr = parseInt(parts[1]);
+    if(baseIp===null||isNaN(baseCidr)||baseCidr<0||baseCidr>32){ errEl.textContent='✗ Invalid network'; return; }
+    if(isNaN(newPrefix)||newPrefix<=baseCidr||newPrefix>30){ errEl.textContent='✗ New prefix must be > base and ≤ 30'; return; }
+
+    const baseMask  = cidrToMask(baseCidr);
+    const network   = (baseIp & baseMask)>>>0;
+    const subCount  = Math.pow(2, newPrefix - baseCidr);
+    const subSize   = Math.pow(2, 32 - newPrefix);
+
+    if(subCount > 4096){ errEl.textContent='✗ Too many subnets (max 4096 displayed)'; return; }
+
+    const newMask   = cidrToMask(newPrefix);
+    const hostsPerSub = numHosts(newPrefix);
+
+    sumEl.innerHTML = `✔ Dividing /${baseCidr} into <strong style="color:var(--green)">${subCount}</strong> subnets of /${newPrefix} · 
+        <strong style="color:var(--green)">${formatNum(hostsPerSub)}</strong> usable hosts each`;
+
+    tbody.innerHTML = '';
+    for(let i=0;i<subCount;i++){
+        const netAddr   = (network + i * subSize)>>>0;
+        const bcast     = (netAddr + subSize - 1)>>>0;
+        const first     = netAddr + 1;
+        const last      = bcast - 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td>
+            <td>${intToIp(netAddr)}/${newPrefix}</td>
+            <td>${intToIp(first)}</td>
+            <td>${intToIp(last)}</td>
+            <td style="color:var(--orange)">${intToIp(bcast)}</td>
+            <td>${formatNum(hostsPerSub)}</td>`;
+        tbody.appendChild(tr);
+    }
+    tableEl.style.display='block';
+}
+
+/* ══════════════════════════════════════════════
+   TAB 4 — WILDCARD
+══════════════════════════════════════════════ */
+function calcWildcard() {
+    const mStr = document.getElementById('wc-mask').value.trim();
+    const errEl = document.getElementById('wc-err');
+    const resEl = document.getElementById('wc-results');
+    errEl.textContent = ''; resEl.style.display='none';
+
+    const parsed = parseMaskOrCidr(mStr);
+    if(!parsed){ errEl.textContent='✗ Invalid mask/CIDR'; return; }
+    const { cidr, mask } = parsed;
+    const wild = (~mask)>>>0;
+
+    resEl.innerHTML = `
+        <div class="wc-row"><div class="wc-row-label">CIDR PREFIX</div><div class="wc-row-val">/${cidr}</div></div>
+        <div class="wc-row"><div class="wc-row-label">SUBNET MASK</div><div class="wc-row-val">${intToIp(mask)}</div></div>
+        <div class="wc-row"><div class="wc-row-label">WILDCARD MASK</div><div class="wc-row-val" style="color:var(--orange)">${intToIp(wild)}</div></div>
+        <div class="wc-row"><div class="wc-row-label">SUBNET MASK (BIN)</div><div class="wc-row-val blue" style="font-size:.78rem">${toBinaryStr(mask).replace(/(.{8})/g,'$1 ').trim()}</div></div>
+        <div class="wc-row"><div class="wc-row-label">WILDCARD (BIN)</div><div class="wc-row-val" style="color:var(--orange);font-size:.78rem">${toBinaryStr(wild).replace(/(.{8})/g,'$1 ').trim()}</div></div>
+        <div class="wc-row"><div class="wc-row-label">TOTAL ADDRESSES</div><div class="wc-row-val">${formatNum(Math.pow(2,32-cidr))}</div></div>
+        <div class="wc-row"><div class="wc-row-label">USABLE HOSTS</div><div class="wc-row-val">${formatNum(numHosts(cidr))}</div></div>
+        <div class="wc-row"><div class="wc-row-label">CISCO ACL USAGE</div><div class="wc-row-val blue">permit 0.0.0.0 ${intToIp(wild)}</div></div>
+    `;
+    resEl.style.display='grid';
+}
+
+// WILDCARD REFERENCE (populate on load)
+(function buildWcRef(){
+    const el = document.getElementById('wc-ref');
+    const refs = [8,16,24,25,26,27,28,29,30];
+    el.innerHTML = refs.map(c => {
+        const m = cidrToMask(c);
+        const w = (~m)>>>0;
+        return `<div class="result-item">
+            <div class="result-label">/${c}</div>
+            <div class="result-val" style="font-size:.85rem;">${intToIp(m)}</div>
+            <div style="font-size:.75rem;color:var(--orange);margin-top:.2rem;">WC: ${intToIp(w)}</div>
+            <div style="font-size:.7rem;color:var(--text-dim);margin-top:.1rem;">${formatNum(numHosts(c))} hosts</div>
+        </div>`;
+    }).join('');
+})();
+
+/* ══════════════════════════════════════════════
+   TAB 5 — IPv6
+══════════════════════════════════════════════ */
+function expandIPv6(addr) {
+    addr = addr.trim().toLowerCase();
+    // Handle :: expansion
+    if(addr.includes('::')) {
+        const sides = addr.split('::');
+        const left  = sides[0] ? sides[0].split(':') : [];
+        const right = sides[1] ? sides[1].split(':') : [];
+        const missing = 8 - left.length - right.length;
+        const mid = Array(missing).fill('0000');
+        const groups = [...left, ...mid, ...right];
+        return groups.map(g => g.padStart(4,'0')).join(':');
+    }
+    return addr.split(':').map(g => g.padStart(4,'0')).join(':');
+}
+function compressIPv6(full) {
+    // Remove leading zeros
+    let groups = full.split(':').map(g => parseInt(g,16).toString(16));
+    // Find longest run of zeros
+    let best={start:-1,len:0}, cur={start:-1,len:0};
+    for(let i=0;i<8;i++){
+        if(groups[i]==='0'){
+            if(cur.start===-1) cur.start=i;
+            cur.len++;
+            if(cur.len>best.len) best={...cur};
+        } else { cur={start:-1,len:0}; }
+    }
+    if(best.len > 1){
+        groups.splice(best.start, best.len, '');
+        if(best.start===0) groups.unshift('');
+        if(best.start+best.len===8) groups.push('');
+    }
+    return groups.join(':');
+}
+
+function processIPv6() {
+    const raw   = document.getElementById('ipv6-input').value.trim();
+    const errEl = document.getElementById('ipv6-err');
+    const resEl = document.getElementById('ipv6-results');
+    errEl.textContent = ''; resEl.style.display='none';
+
+    try {
+        const expanded   = expandIPv6(raw);
+        const groups     = expanded.split(':');
+        if(groups.length !== 8) throw new Error('Invalid IPv6');
+        groups.forEach(g => { if(!/^[0-9a-f]{4}$/i.test(g)) throw new Error('Invalid group: '+g); });
+
+        const compressed = compressIPv6(expanded);
+        const groupsHtml = groups.map(g => {
+            const cls = parseInt(g,16)===0 ? 'zero' : '';
+            return `<div class="ipv6-group ${cls}">${g}</div>`;
+        }).join('');
+
+        let html = `
+            <div class="result-grid" style="margin-bottom:1rem;">
+                <div class="result-item"><div class="result-label">COMPRESSED</div><div class="result-val blue">${compressed}</div></div>
+                <div class="result-item"><div class="result-label">EXPANDED (FULL)</div><div class="result-val blue">${expanded}</div></div>
+                <div class="result-item"><div class="result-label">TOTAL BITS</div><div class="result-val">128</div></div>
+                <div class="result-item"><div class="result-label">GROUPS</div><div class="result-val">8 × 16-bit</div></div>
+            </div>
+            <div style="font-size:.7rem;color:var(--text-dim);margin-bottom:.4rem;">GROUP VISUALIZATION (gray = zero group)</div>
+            <div class="ipv6-groups">${groupsHtml}</div>
+            <div style="margin-top:1rem;font-size:.7rem;color:var(--text-dim);">BINARY REPRESENTATION</div>
+            <div style="margin-top:.4rem;font-size:.75rem;color:var(--green);word-break:break-all;line-height:1.6;">
+                ${groups.map(g => parseInt(g,16).toString(2).padStart(16,'0')).join(' | ')}
+            </div>`;
+        resEl.innerHTML = html;
+        resEl.style.display = 'block';
+    } catch(e) {
+        errEl.textContent = '✗ ' + e.message;
+    }
+}
+
+/* ══════════════════════════════════════════════
+   TAB 6 — CIDR TABLE
+══════════════════════════════════════════════ */
+(function buildCidrTable(){
+    const table = document.getElementById('cidr-table-full');
+    let html = `<thead><tr>
+        <th>CIDR</th><th>SUBNET MASK</th><th>WILDCARD</th>
+        <th>TOTAL IPs</th><th>USABLE HOSTS</th><th>CLASS</th>
+    </tr></thead><tbody>`;
+
+    for(let c=0;c<=32;c++){
+        const m = cidrToMask(c);
+        const w = (~m)>>>0;
+        const total = Math.pow(2,32-c);
+        const hosts = numHosts(c);
+        let cls = '';
+        if(c<=8) cls='class-a';
+        else if(c<=16) cls='class-b';
+        else if(c<=24) cls='class-c';
+        let classLabel = c<=8?'A':c<=16?'B':c<=24?'C':'C+';
+        html += `<tr class="${cls}">
+            <td>/${c}</td>
+            <td>${intToIp(m)}</td>
+            <td>${intToIp(w)}</td>
+            <td>${total >= 1e6 ? (total/1e6).toFixed(1)+'M' : formatNum(total)}</td>
+            <td>${hosts <= 0 ? '—' : hosts >= 1e6 ? (hosts/1e6).toFixed(1)+'M' : formatNum(hosts)}</td>
+            <td>${classLabel}</td>
+        </tr>`;
+    }
+    html += '</tbody>';
+    table.innerHTML = html;
+})();
+
+/* ══════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+══════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+    if(e.key==='Enter'){
+        const active = document.querySelector('.tab-panel.active').id;
+        if(active==='tab-ipcalc') calcIP();
+        if(active==='tab-binary') renderBinary();
+        if(active==='tab-subnetter') calcSubnets();
+        if(active==='tab-wildcard') calcWildcard();
+        if(active==='tab-ipv6') processIPv6();
+    }
+});
+</script>
+</body>
+</html>
