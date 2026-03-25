@@ -1,5 +1,5 @@
-// Store data in memory
-let tributes = [
+// Default data
+const defaultTributes = [
     {
         id: "1",
         name: "Ganja",
@@ -36,6 +36,28 @@ let tributes = [
         comments: []
     }
 ];
+
+// Initialize from localStorage
+let tributes = [];
+try {
+    const saved = localStorage.getItem('paradis_tributes');
+    if (saved) {
+        tributes = JSON.parse(saved);
+    } else {
+        tributes = [...defaultTributes];
+    }
+} catch(e) {
+    tributes = [...defaultTributes];
+}
+
+function saveTributes() {
+    try {
+        localStorage.setItem('paradis_tributes', JSON.stringify(tributes));
+    } catch(e) {
+        console.warn("Stockage plein, impossible de sauvegarder l'image.");
+        alert("Attention : Vous avez atteint la limite de mémoire de votre navigateur (LocalStorage plein). Les prochains hommages ne s'enregistreront pas correctement tant que l'historique n'est pas vidé !");
+    }
+}
 
 let currentTributeId = null;
 let cropper = null;
@@ -164,9 +186,9 @@ createTributeForm.addEventListener('submit', (e) => {
     let photoDataUrl = '';
     if (cropper) {
         photoDataUrl = cropper.getCroppedCanvas({
-            maxWidth: 1024,
-            maxHeight: 1024,
-        }).toDataURL('image/jpeg', 0.8);
+            maxWidth: 600,
+            maxHeight: 600,
+        }).toDataURL('image/jpeg', 0.7);
     }
     
     const newTribute = {
@@ -181,6 +203,7 @@ createTributeForm.addEventListener('submit', (e) => {
     };
     
     tributes.push(newTribute);
+    saveTributes();
     renderTributes();
     
     createModal.classList.remove('active');
@@ -249,6 +272,7 @@ giveCaresseBtn.addEventListener('click', () => {
     const tribute = tributes.find(t => t.id === currentTributeId);
     if (tribute && !giveCaresseBtn.classList.contains('active')) {
         tribute.caresses += 1;
+        saveTributes();
         updateCaressesUI(tribute.caresses);
         giveCaresseBtn.classList.add('active');
         
@@ -287,6 +311,7 @@ commentForm.addEventListener('submit', (e) => {
     const tribute = tributes.find(t => t.id === currentTributeId);
     if (tribute) {
         tribute.comments.push({ author, text });
+        saveTributes();
         renderComments(tribute);
         commentForm.reset();
     }
