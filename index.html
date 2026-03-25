@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Paradis des Animaux - Hommages</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fa-solid fa-dove"></i>
+                <h1>Le Paradis des Animaux</h1>
+            </div>
+            <button class="btn btn-primary" id="openCreateModalBtn">
+                <i class="fa-solid fa-plus"></i> Créer un hommage
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <h2>Un espace de paix et de mémoire</h2>
+                <p>Créé pour honorer la vie de nos compagnons bien-aimés qui ont traversé le pont de l'arc-en-ciel. Laissez un témoignage, partagez une photo et célébrez leur souvenir éternel.</p>
+            </div>
+        </section>
+
+        <section class="tributes-section">
+            <div class="container">
+                <div class="section-header">
+                    <h3 class="section-title">Derniers Hommages</h3>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Rechercher un animal...">
+                    </div>
+                </div>
+                <div class="grid" id="tributesGrid">
+                    <!-- Cards will be dynamically injected here via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; 2026 Le Paradis des Animaux. Fait avec amour et respect.</p>
+        </div>
+    </footer>
+
+    <!-- Create Tribute Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <button class="close-modal" id="closeCreateModal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h3>Créer une fiche hommage</h3>
+                <p>Partagez le souvenir de votre fidèle compagnon.</p>
+            </div>
+            <form id="createTributeForm" class="modal-body">
+                <div class="form-group">
+                    <label for="petName">Nom de l'animal</label>
+                    <input type="text" id="petName" required placeholder="Ex: Milou">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="birthDate">Date de naissance</label>
+                        <input type="date" id="birthDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="deathDate">Date de départ</label>
+                        <input type="date" id="deathDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="photoUpload">Photo (Uploadez une image à recadrer)</label>
+                    <input type="file" id="photoUpload" accept="image/png, image/jpeg, image/jpg">
+                    <div class="crop-container" id="cropContainer" style="display: none; margin-top: 1rem;">
+                        <img id="imageToCrop" src="" alt="A recadrer">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tributeText">Votre message d'hommage</label>
+                    <textarea id="tributeText" required rows="4" placeholder="Ce qu'il représentait pour vous..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Publier l'hommage</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Tribute Modal (Memorial Space) -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal view-modal">
+            <button class="close-modal" id="closeViewModal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="memorial-content" id="memorialContent">
+                <!-- Injected via JS -->
+            </div>
+            
+            <div class="interactions-panel">
+                <div class="caresses-section">
+                    <button class="btn-caresse" id="giveCaresseBtn">
+                        <i class="fa-solid fa-hand-holding-heart"></i> Donner une caresse virtuelle
+                    </button>
+                    <span class="caresses-count" id="caressesCountText">0 caresses</span>
+                </div>
+
+                <div class="comments-section">
+                    <h4>Mots de soutien</h4>
+                    <div class="comments-list" id="commentsList">
+                        <!-- Comments injected via JS -->
+                    </div>
+                    
+                    <form id="commentForm" class="comment-form">
+                        <input type="text" id="commentAuthor" placeholder="Votre nom" required>
+                        <textarea id="commentText" rows="2" placeholder="Laissez un message de soutien..." required></textarea>
+                        <button type="submit" class="btn btn-secondary btn-small">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
